@@ -8,11 +8,19 @@
   <meta name="description" content="Upload any JPG, PNG, MP4 or MOV file for instant AI likelihood analysis.">
   <meta name="keywords" content="AI image detector, AI video detector, AI-generated media, detect deepfake">
 
-  <link rel="stylesheet" href="./MDMF_files/remixicon.min.css">
-  <link rel="stylesheet" href="./MDMF_files/css2(1)">
-  <link rel="stylesheet" href="./MDMF_files/index-DSyDOl0d.css">
+  <!-- Tailwind via CDN so the utility classes in your markup actually style -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-  <script type="module" src="./MDMF_files/index-DIHY79Yf.js.download"></script>
+  <!-- Remix icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+
+  <style>
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    .drop-zone.is-dragging {
+      border-color: #10b981 !important;
+      background-color: #ecfdf5 !important;
+    }
+  </style>
 </head>
 
 <body>
@@ -21,7 +29,6 @@
 
     <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm border-b border-slate-100">
       <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-[70px]">
-
         <a href="#upload" class="flex items-center gap-2.5 cursor-pointer">
           <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-500">
             <i class="ri-scan-2-line text-white text-base"></i>
@@ -42,10 +49,6 @@
             Try for free
           </a>
         </div>
-
-        <button class="md:hidden w-8 h-8 flex items-center justify-center text-slate-600 cursor-pointer" aria-label="Toggle menu">
-          <i class="ri-menu-line text-xl"></i>
-        </button>
       </div>
     </header>
 
@@ -65,9 +68,11 @@
           </p>
         </div>
 
-        <div class="w-full max-w-2xl rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer bg-white border-slate-200 hover:border-emerald-300 hover:bg-slate-50/60">
-          <input accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.webm" class="hidden" type="file">
-          <div class="flex flex-col items-center justify-center py-16 px-8 text-center select-none">
+        <!-- DROP ZONE (empty state) -->
+        <div id="dropZone"
+             class="drop-zone w-full max-w-2xl rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer bg-white border-slate-200 hover:border-emerald-300 hover:bg-slate-50/60">
+          <input id="fileInput" accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.webm" class="hidden" type="file">
+          <div class="flex flex-col items-center justify-center py-16 px-8 text-center select-none pointer-events-none">
             <div class="w-16 h-16 flex items-center justify-center rounded-2xl bg-emerald-50 mb-5">
               <i class="ri-upload-cloud-2-line text-3xl text-emerald-500"></i>
             </div>
@@ -87,89 +92,309 @@
           </div>
         </div>
 
-        <button disabled class="mt-6 px-10 py-4 text-[15px] font-bold text-white rounded-full transition-all duration-200 whitespace-nowrap bg-slate-200 text-slate-400 cursor-not-allowed">
+        <!-- PREVIEW (hidden until a file is loaded) -->
+        <div id="previewCard" class="hidden w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-5">
+          <div class="flex items-start gap-4">
+            <div id="previewMedia" class="flex-shrink-0 w-28 h-28 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
+              <!-- <img> or <video> gets injected here -->
+            </div>
+            <div class="flex-1 min-w-0">
+              <p id="fileName" class="text-[15px] font-semibold text-slate-900 truncate"></p>
+              <p id="fileMeta" class="text-xs text-slate-500 mt-1"></p>
+              <button id="removeBtn" type="button"
+                      class="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 transition-colors">
+                <i class="ri-close-circle-line"></i> Remove file
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ERROR MESSAGE -->
+        <p id="errorMsg" class="hidden mt-4 text-sm font-medium text-rose-600"></p>
+
+        <button id="analyzeBtn" disabled
+                class="mt-6 px-10 py-4 text-[15px] font-bold text-white rounded-full transition-all duration-200 whitespace-nowrap bg-slate-200 text-slate-400 cursor-not-allowed">
           Analyze Media
         </button>
 
         <p class="mt-4 text-xs text-slate-400">
           Your file is processed locally — never stored on our servers.
         </p>
-      </section>
 
-      <section id="how-it-works" class="py-24 px-4 bg-slate-50">
-        <div class="max-w-5xl mx-auto">
-          <div class="text-center mb-16">
-            <span class="inline-block px-3 py-1 text-xs font-semibold tracking-widest uppercase text-emerald-600 bg-emerald-50 rounded-full mb-4">
-              Our Process
-            </span>
-            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
-              How Detection Works
-            </h2>
-            <p class="text-[16px] text-slate-500 max-w-xl mx-auto">
-              Three straightforward steps from upload to verdict — no sign-up, no waiting.
-            </p>
-          </div>
-
-          <!-- Your full How It Works / FAQ / About sections remain unchanged from your current file -->
+        <!-- RESULT (hidden until analysis runs) -->
+        <div id="resultCard" class="hidden mt-8 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6">
+          <p class="text-xs font-semibold tracking-widest uppercase text-emerald-600 mb-2">Result</p>
+          <p id="resultText" class="text-slate-900"></p>
         </div>
-      </section>
-
-      <section id="about" class="py-24 px-4 bg-white">
-        <!-- Keep your current about section here unchanged -->
       </section>
 
     </main>
 
     <footer class="bg-slate-900 text-slate-300 pt-16 pb-8 px-6">
       <div class="max-w-5xl mx-auto">
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-
-          <div>
-            <div class="flex items-center gap-2 mb-4">
-              <div class="w-7 h-7 flex items-center justify-center rounded-lg bg-emerald-500">
-                <i class="ri-scan-2-line text-white text-sm"></i>
-              </div>
-              <span class="text-[14px] font-bold tracking-tight text-white">
-                MDMF<span class="text-emerald-400">AI</span>
-              </span>
-            </div>
-
-            <p class="text-[13px] text-slate-400 leading-relaxed mb-5">
-              Fast, transparent AI detection for images and videos. Built for the open web.
-            </p>
-
-            <div class="flex items-center gap-3">
-              <a href="#" rel="nofollow" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors">
-                <i class="ri-twitter-x-line text-sm"></i>
-              </a>
-              <a href="#" rel="nofollow" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors">
-                <i class="ri-github-line text-sm"></i>
-              </a>
-              <a href="#" rel="nofollow" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors">
-                <i class="ri-linkedin-line text-sm"></i>
-              </a>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p class="text-[12px] text-slate-600">
-            © 2026 MDMF Team. All rights reserved.
-          </p>
-
-          <div class="flex items-center gap-4">
-            <a href="#" class="text-[12px] text-slate-600 hover:text-slate-400">Privacy Policy</a>
-            <a href="#" class="text-[12px] text-slate-600 hover:text-slate-400">Terms of Service</a>
-            <a href="#" class="text-[12px] text-slate-600 hover:text-slate-400">Cookie Policy</a>
-          </div>
-        </div>
-
+        <p class="text-[12px] text-slate-600 text-center">
+          © 2026 MDMF Team. All rights reserved.
+        </p>
       </div>
     </footer>
 
   </div>
 </div>
+
+<script>
+  // ============================================================
+  //  MDMF Upload Logic
+  // ============================================================
+  //  This script:
+  //    1. Wires up click + drag-and-drop on the drop zone.
+  //    2. Validates file type and size.
+  //    3. Stores the selected File object in `currentFile` (in memory).
+  //    4. Renders a preview + enables the Analyze button.
+  //    5. Calls `runDetection(file)` when Analyze is clicked.
+  //
+  //  >>> HAND-OFF TO YOUR MODEL: see the runDetection() function below.
+  // ============================================================
+
+  // ----- State -----
+  let currentFile = null; // the File the user has selected (null when none)
+
+  // ----- Config -----
+  const MAX_BYTES = 100 * 1024 * 1024; // 100 MB (matches the UI text)
+  const ALLOWED_TYPES = [
+    'image/jpeg', 'image/png', 'image/webp', 'image/gif',
+    'video/mp4', 'video/quicktime', 'video/webm'
+  ];
+
+  // ----- Element references -----
+  const dropZone     = document.getElementById('dropZone');
+  const fileInput    = document.getElementById('fileInput');
+  const previewCard  = document.getElementById('previewCard');
+  const previewMedia = document.getElementById('previewMedia');
+  const fileNameEl   = document.getElementById('fileName');
+  const fileMetaEl   = document.getElementById('fileMeta');
+  const removeBtn    = document.getElementById('removeBtn');
+  const analyzeBtn   = document.getElementById('analyzeBtn');
+  const errorMsg     = document.getElementById('errorMsg');
+  const resultCard   = document.getElementById('resultCard');
+  const resultText   = document.getElementById('resultText');
+
+  // ----- Click to open file picker -----
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  // ----- Native file input change -----
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) handleFile(file);
+  });
+
+  // ----- Drag-and-drop -----
+  // preventDefault on dragover is required or the drop event won't fire.
+  ['dragenter', 'dragover'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.add('is-dragging');
+    });
+  });
+  ['dragleave', 'drop'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.remove('is-dragging');
+    });
+  });
+  dropZone.addEventListener('drop', (e) => {
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+
+  // ----- Remove / replace -----
+  removeBtn.addEventListener('click', resetUpload);
+
+  // ----- Analyze button -----
+  analyzeBtn.addEventListener('click', () => {
+    if (!currentFile) return;
+    runDetection(currentFile);
+  });
+
+  // ============================================================
+  //  Core handlers
+  // ============================================================
+
+  function handleFile(file) {
+    clearError();
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      showError(`Unsupported file type: ${file.type || 'unknown'}. Please upload a JPG, PNG, WebP, GIF, MP4, MOV, or WebM file.`);
+      return;
+    }
+
+    if (file.size > MAX_BYTES) {
+      showError(`File is too large (${formatBytes(file.size)}). Maximum size is 100 MB.`);
+      return;
+    }
+
+    // Store in memory — this is the `file` you pass to your model.
+    currentFile = file;
+
+    // Swap UI: hide drop zone, show preview.
+    dropZone.classList.add('hidden');
+    previewCard.classList.remove('hidden');
+    resultCard.classList.add('hidden');
+
+    // Populate preview
+    fileNameEl.textContent = file.name;
+    fileMetaEl.textContent = `${file.type || 'unknown type'} · ${formatBytes(file.size)}`;
+    renderPreview(file);
+
+    // Enable Analyze button
+    analyzeBtn.disabled = false;
+    analyzeBtn.classList.remove('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
+    analyzeBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600', 'cursor-pointer');
+  }
+
+  function renderPreview(file) {
+    // Revoke any previous object URL to avoid memory leaks.
+    if (previewMedia.dataset.objectUrl) {
+      URL.revokeObjectURL(previewMedia.dataset.objectUrl);
+    }
+
+    const url = URL.createObjectURL(file);
+    previewMedia.dataset.objectUrl = url;
+    previewMedia.innerHTML = '';
+
+    if (file.type.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = file.name;
+      img.className = 'w-full h-full object-cover';
+      previewMedia.appendChild(img);
+    } else if (file.type.startsWith('video/')) {
+      const video = document.createElement('video');
+      video.src = url;
+      video.muted = true;
+      video.controls = false;
+      video.className = 'w-full h-full object-cover';
+      previewMedia.appendChild(video);
+    }
+  }
+
+  function resetUpload() {
+    currentFile = null;
+    fileInput.value = ''; // so selecting the same file again still fires 'change'
+
+    if (previewMedia.dataset.objectUrl) {
+      URL.revokeObjectURL(previewMedia.dataset.objectUrl);
+      delete previewMedia.dataset.objectUrl;
+    }
+    previewMedia.innerHTML = '';
+
+    dropZone.classList.remove('hidden');
+    previewCard.classList.add('hidden');
+    resultCard.classList.add('hidden');
+    clearError();
+
+    analyzeBtn.disabled = true;
+    analyzeBtn.classList.add('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
+    analyzeBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600', 'cursor-pointer');
+  }
+
+  // ============================================================
+  //  >>> HAND-OFF TO YOUR MODEL <<<
+  //
+  //  Replace the body of runDetection() with your model call.
+  //  The `file` argument is a standard browser File object:
+  //    - file.name, file.type, file.size
+  //    - file.arrayBuffer()  -> Promise<ArrayBuffer>
+  //    - URL.createObjectURL(file) -> string  (for <img>/<video>)
+  //    - new FileReader().readAsDataURL(file)  (for base64)
+  //
+  //  If your model runs in the browser (TF.js / ONNX.js):
+  //      decode file into a tensor, run model.predict(), show result.
+  //
+  //  If your model runs on a server (Python, etc.):
+  //      use fetch() to POST the file and read the response.
+  //      Commented example at the bottom of this function.
+  // ============================================================
+
+  // Where your FastAPI server is listening. When you deploy later, change this
+  // to your public URL (e.g. "https://mdmf-api.onrender.com").
+  const API_URL = 'http://localhost:8000/detect';
+
+  async function runDetection(file) {
+    analyzeBtn.disabled = true;
+    analyzeBtn.textContent = 'Analyzing…';
+    resultCard.classList.add('hidden');
+    clearError();
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        // Try to surface the server's error message if there is one.
+        let msg = `Server responded ${res.status}`;
+        try {
+          const body = await res.json();
+          if (body && body.detail) msg = body.detail;
+        } catch (_) { /* response wasn't JSON */ }
+        throw new Error(msg);
+      }
+
+      const data = await res.json();
+      // The server returns { score, score_percent, label, media_type, frames_analyzed, filename }
+      const pct = data.score_percent.toFixed(1);
+      const detail = data.media_type === 'video'
+        ? ` (averaged across ${data.frames_analyzed} sampled frames)`
+        : '';
+      showResult(`${pct}% likelihood AI-generated — ${data.label}${detail}.`);
+    } catch (err) {
+      // Common cause during local dev: server not running, or CORS.
+      showError(`Analysis failed: ${err.message}. ` +
+                `Is the API running at ${API_URL}?`);
+    } finally {
+      analyzeBtn.disabled = false;
+      analyzeBtn.textContent = 'Analyze Media';
+    }
+  }
+
+  // Helper: decode an image File into a loaded HTMLImageElement (for TF.js etc.)
+  function loadImageFromFile(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
+      img.src = url;
+    });
+  }
+
+  // ============================================================
+  //  UI helpers
+  // ============================================================
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.remove('hidden');
+  }
+  function clearError() {
+    errorMsg.textContent = '';
+    errorMsg.classList.add('hidden');
+  }
+  function showResult(msg) {
+    resultText.textContent = msg;
+    resultCard.classList.remove('hidden');
+  }
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+</script>
+
 </body>
 </html>
