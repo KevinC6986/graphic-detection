@@ -195,7 +195,6 @@
   const analyzeBtn   = document.getElementById('analyzeBtn');
   const errorMsg     = document.getElementById('errorMsg');
   const resultCard   = document.getElementById('resultCard');
-  const resultText   = document.getElementById('resultText');
 
   // ----- Click to open file picker -----
   dropZone.addEventListener('click', () => fileInput.click());
@@ -366,12 +365,6 @@
       }
 
       const data = await res.json();
-      // The server returns { score, score_percent, label, media_type, frames_analyzed, filename }
-      const pct = data.score_percent.toFixed(1);
-      const detail = data.media_type === 'video'
-        ? ` (averaged across ${data.frames_analyzed} sampled frames)`
-        : '';
-      const data = await res.json();
       renderResult(data);
     } catch (err) {
       // Common cause during local dev: server not running, or CORS.
@@ -405,9 +398,36 @@
     errorMsg.textContent = '';
     errorMsg.classList.add('hidden');
   }
-  function renderResult(msg) {
-    resultText.textContent = msg;
-    resultCard.classList.remove('hidden');
+  function renderResult(data) {
+    const v = data.variants;
+    const agree = data.agreement;
+
+    document.getElementById('agreementBadge').textContent = agree
+      ? '✓ Variants agree' : '⚠ Variants disagree';
+    document.getElementById('agreementBadge').className = 'text-xs font-medium ' +
+      (agree ? 'text-emerald-600' : 'text-amber-600');
+
+    const verdict = data.consensus_label.toUpperCase();
+    const color = data.consensus_label === 'fake' ? 'text-rose-600' : 'text-emerald-600';
+    const consensusEl = document.getElementById('consensusText');
+    consensusEl.textContent = `${verdict} — ${data.score_percent.toFixed(1)}% AI likelihood`;
+    consensusEl.className = `text-2xl font-bold mb-1 ${color}`;
+    document.getElementById('consensusSub').textContent =
+      `Averaged across both MDMF variants.`;
+
+    for (const name of ['imagenet', 'sdv14']) {
+      const entry = v[name];
+      const labelEl = document.getElementById(name + 'Label');
+      labelEl.textContent = `${entry.label.toUpperCase()} (${entry.score_percent.toFixed(1)}%)`;
+      labelEl.className = 'text-lg font-bold mb-1 ' +
+        (entry.label === 'fake' ? 'text-rose-600' : 'text-emerald-600');
+      document.getElementById(name + 'Score').textContent =
+        `raw score ${entry.score >= 0 ? '+' : ''}${entry.score.toFixed(3)} ` +
+        `(threshold ${entry.threshold >= 0 ? '+' : ''}${entry.threshold.toFixed(3)})`;
+      document.getElementById(name + 'Overlay').src = entry.overlay_image;
+    }
+
+    document.getElementById('resultCard').classList.remove('hidden');
   }
   function formatBytes(bytes) {
     if (bytes < 1024) return bytes + ' B';
