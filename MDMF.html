@@ -1,32 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Micro-Defects Expose Macro-Fakes: AI Image Detection</title>
-  <meta name="description" content="Upload any JPG, PNG, MP4 or MOV file for instant AI likelihood analysis.">
-  <meta name="keywords" content="AI image detector, AI video detector, AI-generated media, detect deepfake">
-
-  <!-- Tailwind via CDN so the utility classes in your markup actually style -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Remix icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
-
-  <style>
-    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
-    .drop-zone.is-dragging {
-      border-color: #10b981 !important;
-      background-color: #ecfdf5 !important;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Micro-Defects Expose Macro-Fakes: AI Image Detection</title>
+<meta name="description" content="Upload any JPG, PNG, MP4 or MOV file for instant AI likelihood analysis.">
+<meta name="keywords" content="AI image detector, AI video detector, AI-generated media, detect deepfake">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+<style>
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  .drop-zone.is-dragging {
+    border-color: #10b981 !important;
+    background-color: #ecfdf5 !important;
+  }
+  /* NEW: score-vs-threshold visualization */
+  .score-track {
+    position: relative;
+    height: 8px;
+    background: linear-gradient(to right, #10b981 0%, #fbbf24 50%, #ef4444 100%);
+    border-radius: 4px;
+  }
+  .score-track .threshold-mark {
+    position: absolute;
+    top: -4px;
+    width: 2px;
+    height: 16px;
+    background: #1e293b;
+  }
+  .score-track .score-dot {
+    position: absolute;
+    top: -4px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border: 3px solid #1e293b;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  /* NEW: range slider styling for sensitivity */
+  input[type="range"].sens {
+    -webkit-appearance: none;
+    height: 6px;
+    background: linear-gradient(to right, #1e293b 0%, #10b981 50%, #f59e0b 100%);
+    border-radius: 3px;
+    outline: none;
+  }
+  input[type="range"].sens::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: white; border: 2px solid #10b981; cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+</style>
 </head>
-
 <body>
 <div id="root">
   <div class="min-h-screen flex flex-col font-sans">
 
+    <!-- HEADER unchanged -->
     <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm border-b border-slate-100">
       <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-[70px]">
         <a href="#upload" class="flex items-center gap-2.5 cursor-pointer">
@@ -37,13 +70,11 @@
             MDMF<span class="text-emerald-500">AI</span>
           </span>
         </a>
-
         <nav class="hidden md:flex items-center gap-8">
           <a href="#upload" class="text-[14px] font-medium text-slate-500 hover:text-slate-900 transition-colors cursor-pointer whitespace-nowrap">Upload</a>
           <a href="#how-it-works" class="text-[14px] font-medium text-slate-500 hover:text-slate-900 transition-colors cursor-pointer whitespace-nowrap">How It Works</a>
           <a href="#about" class="text-[14px] font-medium text-slate-500 hover:text-slate-900 transition-colors cursor-pointer whitespace-nowrap">About</a>
         </nav>
-
         <div class="hidden md:flex items-center gap-3">
           <a href="#upload" class="px-4 py-2 text-[13px] font-semibold text-white bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors cursor-pointer whitespace-nowrap">
             Try for free
@@ -53,8 +84,8 @@
     </header>
 
     <main class="flex-1">
-
       <section id="upload" class="min-h-screen flex flex-col justify-center items-center px-4 pt-[70px] pb-20 bg-[#FAFAFA]">
+
         <div class="text-center mb-12 max-w-2xl">
           <span class="inline-block px-3 py-1 text-xs font-semibold tracking-widest uppercase text-emerald-600 bg-emerald-50 rounded-full mb-5">
             AI Media Detector
@@ -68,9 +99,8 @@
           </p>
         </div>
 
-        <!-- DROP ZONE (empty state) -->
-        <div id="dropZone"
-             class="drop-zone w-full max-w-2xl rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer bg-white border-slate-200 hover:border-emerald-300 hover:bg-slate-50/60">
+        <!-- DROP ZONE unchanged -->
+        <div id="dropZone" class="drop-zone w-full max-w-2xl rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer bg-white border-slate-200 hover:border-emerald-300 hover:bg-slate-50/60">
           <input id="fileInput" accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.webm" class="hidden" type="file">
           <div class="flex flex-col items-center justify-center py-16 px-8 text-center select-none pointer-events-none">
             <div class="w-16 h-16 flex items-center justify-center rounded-2xl bg-emerald-50 mb-5">
@@ -78,7 +108,6 @@
             </div>
             <p class="text-[17px] font-semibold text-slate-700 mb-1">Drop your image or video here</p>
             <p class="text-sm text-slate-400 mb-6">or click to browse from your device</p>
-
             <div class="flex flex-wrap justify-center gap-2">
               <span class="px-2.5 py-1 text-xs font-medium text-slate-500 bg-slate-100 rounded-md">JPG</span>
               <span class="px-2.5 py-1 text-xs font-medium text-slate-500 bg-slate-100 rounded-md">PNG</span>
@@ -87,33 +116,66 @@
               <span class="px-2.5 py-1 text-xs font-medium text-slate-500 bg-slate-100 rounded-md">MOV</span>
               <span class="px-2.5 py-1 text-xs font-medium text-slate-500 bg-slate-100 rounded-md">WebM</span>
             </div>
-
             <p class="text-xs text-slate-400 mt-3">Max file size: 100 MB</p>
           </div>
         </div>
 
-        <!-- PREVIEW (hidden until a file is loaded) -->
+        <!-- PREVIEW unchanged -->
         <div id="previewCard" class="hidden w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-5">
           <div class="flex items-start gap-4">
-            <div id="previewMedia" class="flex-shrink-0 w-28 h-28 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
-              <!-- <img> or <video> gets injected here -->
-            </div>
+            <div id="previewMedia" class="flex-shrink-0 w-28 h-28 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center"></div>
             <div class="flex-1 min-w-0">
               <p id="fileName" class="text-[15px] font-semibold text-slate-900 truncate"></p>
               <p id="fileMeta" class="text-xs text-slate-500 mt-1"></p>
-              <button id="removeBtn" type="button"
-                      class="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 transition-colors">
+              <button id="removeBtn" type="button" class="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 transition-colors">
                 <i class="ri-close-circle-line"></i> Remove file
               </button>
             </div>
           </div>
         </div>
 
-        <!-- ERROR MESSAGE -->
+        <!-- ============ NEW: ANALYSIS CONTROLS ============ -->
+        <div id="controlsCard" class="w-full max-w-2xl mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+          <p class="text-xs font-semibold tracking-widest uppercase text-slate-500 mb-4">Analysis settings</p>
+
+          <!-- Variant selection -->
+          <div class="mb-5">
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Detector model
+              <span class="text-xs font-normal text-slate-400 ml-1" title="Different models trained against different generators">
+                <i class="ri-information-line"></i>
+              </span>
+            </label>
+            <select id="variantMode" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="both">Both models — consensus verdict (slower)</option>
+              <option value="imagenet">ImageNet model — best for older generators (GANs, ADM, LDM)</option>
+              <option value="sdv14">SDv1.4 model — best for Stable Diffusion family</option>
+            </select>
+          </div>
+
+          <!-- Sensitivity slider -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-semibold text-slate-700">
+                Sensitivity
+                <span class="text-xs font-normal text-slate-400 ml-1" title="Adjusts the decision threshold (τ in the MDMF paper)">
+                  <i class="ri-information-line"></i>
+                </span>
+              </label>
+              <span id="sensValueLabel" class="text-xs font-medium text-emerald-600">Balanced (50)</span>
+            </div>
+            <input id="sensitivity" type="range" min="0" max="100" value="50" class="sens w-full">
+            <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+              <span>Strict — fewer false alarms</span>
+              <span>Lenient — catches borderline fakes</span>
+            </div>
+          </div>
+        </div>
+        <!-- ============ END NEW CONTROLS ============ -->
+
         <p id="errorMsg" class="hidden mt-4 text-sm font-medium text-rose-600"></p>
 
-        <button id="analyzeBtn" disabled
-                class="mt-6 px-10 py-4 text-[15px] font-bold text-white rounded-full transition-all duration-200 whitespace-nowrap bg-slate-200 text-slate-400 cursor-not-allowed">
+        <button id="analyzeBtn" disabled class="mt-6 px-10 py-4 text-[15px] font-bold text-white rounded-full transition-all duration-200 whitespace-nowrap bg-slate-200 text-slate-400 cursor-not-allowed">
           Analyze Media
         </button>
 
@@ -121,32 +183,29 @@
           Your file is processed locally — never stored on our servers.
         </p>
 
-        <!-- RESULT (hidden until analysis runs) -->
-        <div id="resultCard" class="hidden mt-8 w-full max-w-3xl rounded-2xl border border-slate-200 bg-white p-6">
-          <div class="flex items-baseline justify-between mb-4">
-            <p class="text-xs font-semibold tracking-widest uppercase text-emerald-600">Result</p>
-            <p id="agreementBadge" class="text-xs font-medium"></p>
-          </div>
-          <p id="consensusText" class="text-2xl font-bold text-slate-900 mb-1"></p>
-          <p id="consensusSub" class="text-sm text-slate-500 mb-6"></p>
+        <!-- ============ EXPANDED RESULT CARD ============ -->
+        <div id="resultCard" class="hidden mt-8 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6">
+          <p class="text-xs font-semibold tracking-widest uppercase text-emerald-600 mb-2">Result</p>
+          <p id="resultText" class="text-slate-900 text-lg font-semibold mb-4"></p>
 
-          <div class="grid md:grid-cols-2 gap-4">
-            <div class="rounded-xl border border-slate-200 p-4">
-              <p class="text-xs font-semibold tracking-wider uppercase text-slate-400 mb-2">ImageNet / ProGAN variant</p>
-              <p id="imagenetLabel" class="text-lg font-bold mb-1"></p>
-              <p id="imagenetScore" class="text-xs text-slate-500 mb-3"></p>
-              <img id="imagenetOverlay" class="w-full rounded-lg" alt="ImageNet variant heatmap">
-            </div>
-            <div class="rounded-xl border border-slate-200 p-4">
-              <p class="text-xs font-semibold tracking-wider uppercase text-slate-400 mb-2">SD v1.4 / GenImage variant</p>
-              <p id="sdv14Label" class="text-lg font-bold mb-1"></p>
-              <p id="sdv14Score" class="text-xs text-slate-500 mb-3"></p>
-              <img id="sdv14Overlay" class="w-full rounded-lg" alt="SDv1.4 variant heatmap">
-            </div>
+          <!-- NEW: Per-variant score visualization -->
+          <div id="variantBreakdown" class="space-y-5 mt-5"></div>
+
+          <!-- NEW: Heatmap toggle + grid -->
+          <div class="mt-6">
+            <button id="toggleOverlay" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-1">
+              <i class="ri-eye-line"></i>
+              <span id="toggleOverlayLabel">Show forensic heatmap</span>
+            </button>
+            <div id="overlayGrid" class="hidden mt-4 grid gap-4"></div>
+            <p class="text-xs text-slate-400 mt-2 hidden" id="overlayHelp">
+              Warmer regions show where the detector found generation-typical patterns.
+            </p>
           </div>
         </div>
-      </section>
+        <!-- ============ END RESULT CARD ============ -->
 
+      </section>
     </main>
 
     <footer class="bg-slate-900 text-slate-300 pt-16 pb-8 px-6">
@@ -161,289 +220,275 @@
 </div>
 
 <script>
-  // ============================================================
-  //  MDMF Upload Logic
-  // ============================================================
-  //  This script:
-  //    1. Wires up click + drag-and-drop on the drop zone.
-  //    2. Validates file type and size.
-  //    3. Stores the selected File object in `currentFile` (in memory).
-  //    4. Renders a preview + enables the Analyze button.
-  //    5. Calls `runDetection(file)` when Analyze is clicked.
-  //
-  //  >>> HAND-OFF TO YOUR MODEL: see the runDetection() function below.
-  // ============================================================
+// ============================================================
+// MDMF Upload + Analysis Logic
+// ============================================================
+let currentFile = null;
+const MAX_BYTES = 100 * 1024 * 1024;
+const ALLOWED_TYPES = [
+  'image/jpeg', 'image/png', 'image/webp', 'image/gif',
+  'video/mp4', 'video/quicktime', 'video/webm'
+];
 
-  // ----- State -----
-  let currentFile = null; // the File the user has selected (null when none)
+const dropZone     = document.getElementById('dropZone');
+const fileInput    = document.getElementById('fileInput');
+const previewCard  = document.getElementById('previewCard');
+const previewMedia = document.getElementById('previewMedia');
+const fileNameEl   = document.getElementById('fileName');
+const fileMetaEl   = document.getElementById('fileMeta');
+const removeBtn    = document.getElementById('removeBtn');
+const analyzeBtn   = document.getElementById('analyzeBtn');
+const errorMsg     = document.getElementById('errorMsg');
+const resultCard   = document.getElementById('resultCard');
+const resultText   = document.getElementById('resultText');
 
-  // ----- Config -----
-  const MAX_BYTES = 100 * 1024 * 1024; // 100 MB (matches the UI text)
-  const ALLOWED_TYPES = [
-    'image/jpeg', 'image/png', 'image/webp', 'image/gif',
-    'video/mp4', 'video/quicktime', 'video/webm'
-  ];
+// NEW element references
+const sensitivity      = document.getElementById('sensitivity');
+const sensValueLabel   = document.getElementById('sensValueLabel');
+const variantMode      = document.getElementById('variantMode');
+const variantBreakdown = document.getElementById('variantBreakdown');
+const toggleOverlay    = document.getElementById('toggleOverlay');
+const toggleOverlayLbl = document.getElementById('toggleOverlayLabel');
+const overlayGrid      = document.getElementById('overlayGrid');
+const overlayHelp      = document.getElementById('overlayHelp');
 
-  // ----- Element references -----
-  const dropZone     = document.getElementById('dropZone');
-  const fileInput    = document.getElementById('fileInput');
-  const previewCard  = document.getElementById('previewCard');
-  const previewMedia = document.getElementById('previewMedia');
-  const fileNameEl   = document.getElementById('fileName');
-  const fileMetaEl   = document.getElementById('fileMeta');
-  const removeBtn    = document.getElementById('removeBtn');
-  const analyzeBtn   = document.getElementById('analyzeBtn');
-  const errorMsg     = document.getElementById('errorMsg');
-  const resultCard   = document.getElementById('resultCard');
+// NEW: live sensitivity label
+sensitivity.addEventListener('input', (e) => {
+  const v = parseInt(e.target.value, 10);
+  let label;
+  if (v < 25)      label = `Strict (${v})`;
+  else if (v < 45) label = `Cautious (${v})`;
+  else if (v <= 55) label = `Balanced (${v})`;
+  else if (v < 75) label = `Permissive (${v})`;
+  else             label = `Lenient (${v})`;
+  sensValueLabel.textContent = label;
+});
 
-  // ----- Click to open file picker -----
-  dropZone.addEventListener('click', () => fileInput.click());
+// NEW: heatmap toggle
+toggleOverlay.addEventListener('click', () => {
+  const hidden = overlayGrid.classList.contains('hidden');
+  overlayGrid.classList.toggle('hidden');
+  overlayHelp.classList.toggle('hidden');
+  toggleOverlayLbl.textContent = hidden ? 'Hide forensic heatmap' : 'Show forensic heatmap';
+});
 
-  // ----- Native file input change -----
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) handleFile(file);
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (file) handleFile(file);
+});
+
+['dragenter', 'dragover'].forEach(evt => {
+  dropZone.addEventListener(evt, (e) => {
+    e.preventDefault(); e.stopPropagation();
+    dropZone.classList.add('is-dragging');
   });
-
-  // ----- Drag-and-drop -----
-  // preventDefault on dragover is required or the drop event won't fire.
-  ['dragenter', 'dragover'].forEach(evt => {
-    dropZone.addEventListener(evt, (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropZone.classList.add('is-dragging');
-    });
+});
+['dragleave', 'drop'].forEach(evt => {
+  dropZone.addEventListener(evt, (e) => {
+    e.preventDefault(); e.stopPropagation();
+    dropZone.classList.remove('is-dragging');
   });
-  ['dragleave', 'drop'].forEach(evt => {
-    dropZone.addEventListener(evt, (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropZone.classList.remove('is-dragging');
-    });
-  });
-  dropZone.addEventListener('drop', (e) => {
-    const file = e.dataTransfer.files && e.dataTransfer.files[0];
-    if (file) handleFile(file);
-  });
+});
+dropZone.addEventListener('drop', (e) => {
+  const file = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
 
-  // ----- Remove / replace -----
-  removeBtn.addEventListener('click', resetUpload);
+removeBtn.addEventListener('click', resetUpload);
+analyzeBtn.addEventListener('click', () => {
+  if (!currentFile) return;
+  runDetection(currentFile);
+});
 
-  // ----- Analyze button -----
-  analyzeBtn.addEventListener('click', () => {
-    if (!currentFile) return;
-    runDetection(currentFile);
-  });
+function handleFile(file) {
+  clearError();
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    showError(`Unsupported file type: ${file.type || 'unknown'}.`);
+    return;
+  }
+  if (file.size > MAX_BYTES) {
+    showError(`File is too large (${formatBytes(file.size)}). Maximum size is 100 MB.`);
+    return;
+  }
+  currentFile = file;
+  dropZone.classList.add('hidden');
+  previewCard.classList.remove('hidden');
+  resultCard.classList.add('hidden');
+  fileNameEl.textContent = file.name;
+  fileMetaEl.textContent = `${file.type || 'unknown type'} · ${formatBytes(file.size)}`;
+  renderPreview(file);
+  analyzeBtn.disabled = false;
+  analyzeBtn.classList.remove('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
+  analyzeBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600', 'cursor-pointer');
+}
 
-  // ============================================================
-  //  Core handlers
-  // ============================================================
+function renderPreview(file) {
+  if (previewMedia.dataset.objectUrl) URL.revokeObjectURL(previewMedia.dataset.objectUrl);
+  const url = URL.createObjectURL(file);
+  previewMedia.dataset.objectUrl = url;
+  previewMedia.innerHTML = '';
+  if (file.type.startsWith('image/')) {
+    const img = document.createElement('img');
+    img.src = url; img.alt = file.name;
+    img.className = 'w-full h-full object-cover';
+    previewMedia.appendChild(img);
+  } else if (file.type.startsWith('video/')) {
+    const video = document.createElement('video');
+    video.src = url; video.muted = true; video.controls = false;
+    video.className = 'w-full h-full object-cover';
+    previewMedia.appendChild(video);
+  }
+}
 
-  function handleFile(file) {
-    clearError();
+function resetUpload() {
+  currentFile = null;
+  fileInput.value = '';
+  if (previewMedia.dataset.objectUrl) {
+    URL.revokeObjectURL(previewMedia.dataset.objectUrl);
+    delete previewMedia.dataset.objectUrl;
+  }
+  previewMedia.innerHTML = '';
+  dropZone.classList.remove('hidden');
+  previewCard.classList.add('hidden');
+  resultCard.classList.add('hidden');
+  clearError();
+  analyzeBtn.disabled = true;
+  analyzeBtn.classList.add('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
+  analyzeBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600', 'cursor-pointer');
+}
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      showError(`Unsupported file type: ${file.type || 'unknown'}. Please upload a JPG, PNG, WebP, GIF, MP4, MOV, or WebM file.`);
-      return;
+const API_URL = 'http://localhost:8000/detect';
+
+async function runDetection(file) {
+  analyzeBtn.disabled = true;
+  analyzeBtn.textContent = 'Analyzing…';
+  resultCard.classList.add('hidden');
+  clearError();
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    // NEW: send sensitivity (0-1) and mode
+    formData.append('sensitivity', (parseInt(sensitivity.value, 10) / 100).toString());
+    formData.append('mode', variantMode.value);
+
+    const res = await fetch(API_URL, { method: 'POST', body: formData });
+    if (!res.ok) {
+      let msg = `Server responded ${res.status}`;
+      try {
+        const body = await res.json();
+        if (body && body.detail) msg = body.detail;
+      } catch (_) {}
+      throw new Error(msg);
     }
-
-    if (file.size > MAX_BYTES) {
-      showError(`File is too large (${formatBytes(file.size)}). Maximum size is 100 MB.`);
-      return;
-    }
-
-    // Store in memory — this is the `file` you pass to your model.
-    currentFile = file;
-
-    // Swap UI: hide drop zone, show preview.
-    dropZone.classList.add('hidden');
-    previewCard.classList.remove('hidden');
-    resultCard.classList.add('hidden');
-
-    // Populate preview
-    fileNameEl.textContent = file.name;
-    fileMetaEl.textContent = `${file.type || 'unknown type'} · ${formatBytes(file.size)}`;
-    renderPreview(file);
-
-    // Enable Analyze button
+    const data = await res.json();
+    renderResult(data);
+  } catch (err) {
+    showError(`Analysis failed: ${err.message}. Is the API running at ${API_URL}?`);
+  } finally {
     analyzeBtn.disabled = false;
-    analyzeBtn.classList.remove('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
-    analyzeBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600', 'cursor-pointer');
+    analyzeBtn.textContent = 'Analyze Media';
+  }
+}
+
+// NEW: full result rendering with per-variant breakdowns and heatmap toggle
+function renderResult(data) {
+  const verdictWord = data.label === 'fake' ? 'Likely AI-generated'
+                    : data.label === 'real' ? 'Likely authentic'
+                    : 'Unsure — models disagree';
+  const pctText = data.score_percent != null
+                ? ` · ${data.score_percent.toFixed(1)}% AI-likelihood` : '';
+  resultText.innerHTML = `<span class="${
+    data.label === 'fake' ? 'text-rose-600' :
+    data.label === 'real' ? 'text-emerald-600' : 'text-amber-600'
+  }">${verdictWord}</span>${pctText}`;
+
+  // Build per-variant breakdown blocks
+  variantBreakdown.innerHTML = '';
+  const variantNames = {
+    imagenet: 'ImageNet model (older generators)',
+    sdv14:    'SDv1.4 model (Stable Diffusion family)',
+  };
+
+  for (const [key, v] of Object.entries(data.variants)) {
+    const block = document.createElement('div');
+    block.className = 'border border-slate-100 rounded-xl p-4 bg-slate-50/60';
+
+    // Map raw score onto a -10 to +10 visual range, with threshold at center
+    // (clamped — extreme scores just sit at the ends).
+    const rangeHalfWidth = 10;
+    const dist = Math.max(-rangeHalfWidth, Math.min(rangeHalfWidth, v.distance_from_threshold));
+    const dotPosPct = ((dist + rangeHalfWidth) / (2 * rangeHalfWidth)) * 100;
+
+    const verdictColor = v.label === 'fake' ? 'text-rose-600' : 'text-emerald-600';
+    const thrAdjusted  = Math.abs(v.threshold - v.default_threshold) > 0.01
+      ? `<span class="text-xs text-slate-400">(adjusted from default ${v.default_threshold.toFixed(2)})</span>`
+      : '';
+
+    block.innerHTML = `
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-sm font-semibold text-slate-700">${variantNames[key] || key}</span>
+        <span class="text-sm font-bold ${verdictColor}">${v.label.toUpperCase()}</span>
+      </div>
+      <div class="score-track mb-2">
+        <div class="threshold-mark" style="left: 50%;"></div>
+        <div class="score-dot" style="left: ${dotPosPct}%;"></div>
+      </div>
+      <div class="flex justify-between text-[11px] text-slate-500 mb-2">
+        <span>Real</span>
+        <span>Threshold τ = ${v.threshold.toFixed(2)} ${thrAdjusted}</span>
+        <span>Fake</span>
+      </div>
+      <div class="text-xs text-slate-600 mt-2">
+        Raw MMD score: <span class="font-mono font-semibold">${v.score.toFixed(3)}</span>
+        · Distance from threshold:
+        <span class="font-mono font-semibold ${v.distance_from_threshold > 0 ? 'text-rose-600' : 'text-emerald-600'}">
+          ${v.distance_from_threshold > 0 ? '+' : ''}${v.distance_from_threshold.toFixed(3)}
+        </span>
+        · Display: <span class="font-semibold">${v.score_percent.toFixed(1)}%</span>
+      </div>
+    `;
+    variantBreakdown.appendChild(block);
   }
 
-  function renderPreview(file) {
-    // Revoke any previous object URL to avoid memory leaks.
-    if (previewMedia.dataset.objectUrl) {
-      URL.revokeObjectURL(previewMedia.dataset.objectUrl);
-    }
+  // Build heatmap grid
+  overlayGrid.innerHTML = '';
+  const variantsWithOverlay = Object.entries(data.variants).filter(([_, v]) => v.overlay_image);
+  overlayGrid.className = variantsWithOverlay.length > 1
+    ? 'mt-4 grid grid-cols-2 gap-4'
+    : 'mt-4 grid grid-cols-1 gap-4';
 
-    const url = URL.createObjectURL(file);
-    previewMedia.dataset.objectUrl = url;
-    previewMedia.innerHTML = '';
-
-    if (file.type.startsWith('image/')) {
-      const img = document.createElement('img');
-      img.src = url;
-      img.alt = file.name;
-      img.className = 'w-full h-full object-cover';
-      previewMedia.appendChild(img);
-    } else if (file.type.startsWith('video/')) {
-      const video = document.createElement('video');
-      video.src = url;
-      video.muted = true;
-      video.controls = false;
-      video.className = 'w-full h-full object-cover';
-      previewMedia.appendChild(video);
-    }
+  for (const [key, v] of variantsWithOverlay) {
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `
+      <p class="text-xs font-semibold text-slate-700 mb-1">${variantNames[key] || key}</p>
+      <img src="${v.overlay_image}" class="w-full rounded-lg border border-slate-200" alt="Forensic heatmap (${key})">
+    `;
+    overlayGrid.appendChild(wrap);
   }
 
-  function resetUpload() {
-    currentFile = null;
-    fileInput.value = ''; // so selecting the same file again still fires 'change'
+  // Reset overlay to hidden state on each new result
+  overlayGrid.classList.add('hidden');
+  overlayHelp.classList.add('hidden');
+  toggleOverlayLbl.textContent = 'Show forensic heatmap';
 
-    if (previewMedia.dataset.objectUrl) {
-      URL.revokeObjectURL(previewMedia.dataset.objectUrl);
-      delete previewMedia.dataset.objectUrl;
-    }
-    previewMedia.innerHTML = '';
+  resultCard.classList.remove('hidden');
+}
 
-    dropZone.classList.remove('hidden');
-    previewCard.classList.add('hidden');
-    resultCard.classList.add('hidden');
-    clearError();
-
-    analyzeBtn.disabled = true;
-    analyzeBtn.classList.add('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
-    analyzeBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600', 'cursor-pointer');
-  }
-
-  // ============================================================
-  //  >>> HAND-OFF TO YOUR MODEL <<<
-  //
-  //  Replace the body of runDetection() with your model call.
-  //  The `file` argument is a standard browser File object:
-  //    - file.name, file.type, file.size
-  //    - file.arrayBuffer()  -> Promise<ArrayBuffer>
-  //    - URL.createObjectURL(file) -> string  (for <img>/<video>)
-  //    - new FileReader().readAsDataURL(file)  (for base64)
-  //
-  //  If your model runs in the browser (TF.js / ONNX.js):
-  //      decode file into a tensor, run model.predict(), show result.
-  //
-  //  If your model runs on a server (Python, etc.):
-  //      use fetch() to POST the file and read the response.
-  //      Commented example at the bottom of this function.
-  // ============================================================
-
-  // Where your FastAPI server is listening. When you deploy later, change this
-  // to your public URL (e.g. "https://mdmf-api.onrender.com").
-  const API_URL = 'https://kchromatic3-mdmf-api.hf.space/detect';
-
-  async function runDetection(file) {
-    analyzeBtn.disabled = true;
-    analyzeBtn.textContent = 'Analyzing…';
-    resultCard.classList.add('hidden');
-    clearError();
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        // Try to surface the server's error message if there is one.
-        let msg = `Server responded ${res.status}`;
-        try {
-          const body = await res.json();
-          if (body && body.detail) msg = body.detail;
-        } catch (_) { /* response wasn't JSON */ }
-        throw new Error(msg);
-      }
-
-      const data = await res.json();
-      renderResult(data);
-    } catch (err) {
-      // Common cause during local dev: server not running, or CORS.
-      showError(`Analysis failed: ${err.message}. ` +
-                `Is the API running at ${API_URL}?`);
-    } finally {
-      analyzeBtn.disabled = false;
-      analyzeBtn.textContent = 'Analyze Media';
-    }
-  }
-
-  // Helper: decode an image File into a loaded HTMLImageElement (for TF.js etc.)
-  function loadImageFromFile(file) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-      img.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
-      img.src = url;
-    });
-  }
-
-  // ============================================================
-  //  UI helpers
-  // ============================================================
-  function showError(msg) {
-    errorMsg.textContent = msg;
-    errorMsg.classList.remove('hidden');
-  }
-  function clearError() {
-    errorMsg.textContent = '';
-    errorMsg.classList.add('hidden');
-  }
-  function renderResult(data) {
-    const v = data.variants;
-    const agree = data.agreement;
-
-    document.getElementById('agreementBadge').textContent = agree
-      ? '✓ Variants agree' : '⚠ Variants disagree';
-    document.getElementById('agreementBadge').className = 'text-xs font-medium ' +
-      (agree ? 'text-emerald-600' : 'text-amber-600');
-
-    const label = data.consensus_label;
-    const consensusEl = document.getElementById('consensusText');
-    const consensusSubEl = document.getElementById('consensusSub');
-
-    if (label === 'unsure') {
-      consensusEl.textContent = 'UNSURE — variants disagree';
-      consensusEl.className = 'text-2xl font-bold mb-1 text-amber-600';
-      consensusSubEl.textContent =
-        'The two MDMF variants reached different conclusions on this image. See individual results below.';
-    } else {
-      const verdict = label.toUpperCase();
-      const color = label === 'fake' ? 'text-rose-600' : 'text-emerald-600';
-      consensusEl.textContent = `${verdict} — ${data.score_percent.toFixed(1)}% AI likelihood`;
-      consensusEl.className = `text-2xl font-bold mb-1 ${color}`;
-      consensusSubEl.textContent = 'Averaged across both MDMF variants.';
-    }
-
-    for (const name of ['imagenet', 'sdv14']) {
-      const entry = v[name];
-      const labelEl = document.getElementById(name + 'Label');
-      labelEl.textContent = `${entry.label.toUpperCase()} (${entry.score_percent.toFixed(1)}%)`;
-      labelEl.className = 'text-lg font-bold mb-1 ' +
-        (entry.label === 'fake' ? 'text-rose-600' : 'text-emerald-600');
-      document.getElementById(name + 'Score').textContent =
-        `raw score ${entry.score >= 0 ? '+' : ''}${entry.score.toFixed(3)} ` +
-        `(threshold ${entry.threshold >= 0 ? '+' : ''}${entry.threshold.toFixed(3)})`;
-      document.getElementById(name + 'Overlay').src = entry.overlay_image;
-    }
-
-    document.getElementById('resultCard').classList.remove('hidden');
-  }
-  function formatBytes(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  }
+function showError(msg) {
+  errorMsg.textContent = msg;
+  errorMsg.classList.remove('hidden');
+}
+function clearError() {
+  errorMsg.textContent = '';
+  errorMsg.classList.add('hidden');
+}
+function formatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
 </script>
-
 </body>
 </html>
