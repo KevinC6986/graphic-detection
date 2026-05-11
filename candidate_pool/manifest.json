@@ -1,0 +1,406 @@
+{
+  "real": [
+    {
+      "pool_id": 1,
+      "filename": "1.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/844/ILSVRC2012_val_00024696.png",
+      "imagenet_class": "844",
+      "mdmf_score": -8.7474,
+      "mdmf_predicted": "real",
+      "cam_max": 0.851
+    },
+    {
+      "pool_id": 2,
+      "filename": "2.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/600/ILSVRC2012_val_00040536.png",
+      "imagenet_class": "600",
+      "mdmf_score": -8.7463,
+      "mdmf_predicted": "real",
+      "cam_max": 0.51
+    },
+    {
+      "pool_id": 3,
+      "filename": "3.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/721/ILSVRC2012_val_00008191.png",
+      "imagenet_class": "721",
+      "mdmf_score": -8.7292,
+      "mdmf_predicted": "real",
+      "cam_max": 0.581
+    },
+    {
+      "pool_id": 4,
+      "filename": "4.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/184/ILSVRC2012_val_00016711.png",
+      "imagenet_class": "184",
+      "mdmf_score": -8.7109,
+      "mdmf_predicted": "real",
+      "cam_max": 0.58
+    },
+    {
+      "pool_id": 5,
+      "filename": "5.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/323/ILSVRC2012_val_00005952.png",
+      "imagenet_class": "323",
+      "mdmf_score": -8.708,
+      "mdmf_predicted": "real",
+      "cam_max": 0.521
+    },
+    {
+      "pool_id": 6,
+      "filename": "6.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/303/ILSVRC2012_val_00006823.png",
+      "imagenet_class": "303",
+      "mdmf_score": -8.708,
+      "mdmf_predicted": "real",
+      "cam_max": 0.529
+    },
+    {
+      "pool_id": 7,
+      "filename": "7.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/226/ILSVRC2012_val_00044034.png",
+      "imagenet_class": "226",
+      "mdmf_score": -8.7012,
+      "mdmf_predicted": "real",
+      "cam_max": 0.742
+    },
+    {
+      "pool_id": 8,
+      "filename": "8.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/799/ILSVRC2012_val_00017394.png",
+      "imagenet_class": "799",
+      "mdmf_score": -8.7001,
+      "mdmf_predicted": "real",
+      "cam_max": 0.533
+    },
+    {
+      "pool_id": 9,
+      "filename": "9.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/192/ILSVRC2012_val_00030394.png",
+      "imagenet_class": "192",
+      "mdmf_score": -8.6827,
+      "mdmf_predicted": "real",
+      "cam_max": 0.989
+    },
+    {
+      "pool_id": 10,
+      "filename": "10.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/698/ILSVRC2012_val_00043029.png",
+      "imagenet_class": "698",
+      "mdmf_score": -8.6817,
+      "mdmf_predicted": "real",
+      "cam_max": 0.583
+    },
+    {
+      "pool_id": 11,
+      "filename": "11.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/179/ILSVRC2012_val_00037318.png",
+      "imagenet_class": "179",
+      "mdmf_score": -8.6799,
+      "mdmf_predicted": "real",
+      "cam_max": 0.825
+    },
+    {
+      "pool_id": 12,
+      "filename": "12.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/920/ILSVRC2012_val_00024952.png",
+      "imagenet_class": "920",
+      "mdmf_score": -8.6789,
+      "mdmf_predicted": "real",
+      "cam_max": 0.486
+    },
+    {
+      "pool_id": 13,
+      "filename": "13.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/564/ILSVRC2012_val_00038732.png",
+      "imagenet_class": "564",
+      "mdmf_score": -8.6789,
+      "mdmf_predicted": "real",
+      "cam_max": 0.804
+    },
+    {
+      "pool_id": 14,
+      "filename": "14.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/488/ILSVRC2012_val_00005241.png",
+      "imagenet_class": "488",
+      "mdmf_score": -8.6733,
+      "mdmf_predicted": "real",
+      "cam_max": 0.942
+    },
+    {
+      "pool_id": 15,
+      "filename": "15.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/642/ILSVRC2012_val_00046386.png",
+      "imagenet_class": "642",
+      "mdmf_score": -8.6646,
+      "mdmf_predicted": "real",
+      "cam_max": 0.573
+    },
+    {
+      "pool_id": 16,
+      "filename": "16.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/641/ILSVRC2012_val_00044207.png",
+      "imagenet_class": "641",
+      "mdmf_score": -8.6619,
+      "mdmf_predicted": "real",
+      "cam_max": 0.734
+    },
+    {
+      "pool_id": 17,
+      "filename": "17.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/841/ILSVRC2012_val_00012434.png",
+      "imagenet_class": "841",
+      "mdmf_score": -8.6619,
+      "mdmf_predicted": "real",
+      "cam_max": 0.51
+    },
+    {
+      "pool_id": 18,
+      "filename": "18.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/351/ILSVRC2012_val_00003482.png",
+      "imagenet_class": "351",
+      "mdmf_score": -8.6516,
+      "mdmf_predicted": "real",
+      "cam_max": 0.982
+    },
+    {
+      "pool_id": 19,
+      "filename": "19.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/778/ILSVRC2012_val_00013890.png",
+      "imagenet_class": "778",
+      "mdmf_score": -8.6414,
+      "mdmf_predicted": "real",
+      "cam_max": 0.507
+    },
+    {
+      "pool_id": 20,
+      "filename": "20.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256/val/120/ILSVRC2012_val_00007370.png",
+      "imagenet_class": "120",
+      "mdmf_score": -8.6303,
+      "mdmf_predicted": "real",
+      "cam_max": 0.5
+    }
+  ],
+  "fake": [
+    {
+      "pool_id": 1,
+      "filename": "1.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-ADMG/691/image046.png",
+      "generator": "ADMG",
+      "imagenet_class": "691",
+      "mdmf_score": -6.8111,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.686,
+      "cam_max": 0.768
+    },
+    {
+      "pool_id": 2,
+      "filename": "2.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-ADM/104/image035.png",
+      "generator": "ADM",
+      "imagenet_class": "104",
+      "mdmf_score": -6.6242,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.866,
+      "cam_max": 0.958
+    },
+    {
+      "pool_id": 3,
+      "filename": "3.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-DiT-XL-2/134/72134.png",
+      "generator": "DiT-XL-2",
+      "imagenet_class": "134",
+      "mdmf_score": -7.1597,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.883,
+      "cam_max": 1.0
+    },
+    {
+      "pool_id": 4,
+      "filename": "4.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-LDM/473/14735.png",
+      "generator": "LDM",
+      "imagenet_class": "473",
+      "mdmf_score": -3.4105,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.97,
+      "cam_max": 1.0
+    },
+    {
+      "pool_id": 5,
+      "filename": "5.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-ADMG/553/image030.png",
+      "generator": "ADMG",
+      "imagenet_class": "553",
+      "mdmf_score": -7.456,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.672,
+      "cam_max": 0.821
+    },
+    {
+      "pool_id": 6,
+      "filename": "6.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-ADM/63/image032.png",
+      "generator": "ADM",
+      "imagenet_class": "63",
+      "mdmf_score": -3.6074,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.813,
+      "cam_max": 0.845
+    },
+    {
+      "pool_id": 7,
+      "filename": "7.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-DiT-XL-2/704/34704.png",
+      "generator": "DiT-XL-2",
+      "imagenet_class": "704",
+      "mdmf_score": -3.6866,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.837,
+      "cam_max": 0.863
+    },
+    {
+      "pool_id": 8,
+      "filename": "8.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-LDM/240/82405.png",
+      "generator": "LDM",
+      "imagenet_class": "240",
+      "mdmf_score": -7.5003,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.81,
+      "cam_max": 0.932
+    },
+    {
+      "pool_id": 9,
+      "filename": "9.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-ADMG/559/image021.png",
+      "generator": "ADMG",
+      "imagenet_class": "559",
+      "mdmf_score": -4.1262,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.669,
+      "cam_max": 0.736
+    },
+    {
+      "pool_id": 10,
+      "filename": "10.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-ADM/31/image029.png",
+      "generator": "ADM",
+      "imagenet_class": "31",
+      "mdmf_score": -7.6293,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.727,
+      "cam_max": 0.858
+    },
+    {
+      "pool_id": 11,
+      "filename": "11.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-DiT-XL-2/388/60388.png",
+      "generator": "DiT-XL-2",
+      "imagenet_class": "388",
+      "mdmf_score": -7.1487,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.789,
+      "cam_max": 0.968
+    },
+    {
+      "pool_id": 12,
+      "filename": "12.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-LDM/316/43162.png",
+      "generator": "LDM",
+      "imagenet_class": "316",
+      "mdmf_score": -7.4279,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.679,
+      "cam_max": 0.83
+    },
+    {
+      "pool_id": 13,
+      "filename": "13.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-ADMG/568/image042.png",
+      "generator": "ADMG",
+      "imagenet_class": "568",
+      "mdmf_score": -5.3228,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.646,
+      "cam_max": 0.739
+    },
+    {
+      "pool_id": 14,
+      "filename": "14.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-ADM/546/image035.png",
+      "generator": "ADM",
+      "imagenet_class": "546",
+      "mdmf_score": -3.9749,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.715,
+      "cam_max": 0.845
+    },
+    {
+      "pool_id": 15,
+      "filename": "15.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-DiT-XL-2/67/42067.png",
+      "generator": "DiT-XL-2",
+      "imagenet_class": "67",
+      "mdmf_score": -6.725,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.667,
+      "cam_max": 0.776
+    },
+    {
+      "pool_id": 16,
+      "filename": "16.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-LDM/382/33828.png",
+      "generator": "LDM",
+      "imagenet_class": "382",
+      "mdmf_score": -5.635,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.656,
+      "cam_max": 0.818
+    },
+    {
+      "pool_id": 17,
+      "filename": "17.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-ADMG/294/image007.png",
+      "generator": "ADMG",
+      "imagenet_class": "294",
+      "mdmf_score": -7.0564,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.634,
+      "cam_max": 0.792
+    },
+    {
+      "pool_id": 18,
+      "filename": "18.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-ADM/152/image048.png",
+      "generator": "ADM",
+      "imagenet_class": "152",
+      "mdmf_score": -7.2429,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.694,
+      "cam_max": 0.831
+    },
+    {
+      "pool_id": 19,
+      "filename": "19.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-DiT-XL-2/318/91318.png",
+      "generator": "DiT-XL-2",
+      "imagenet_class": "318",
+      "mdmf_score": -5.1682,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.616,
+      "cam_max": 0.763
+    },
+    {
+      "pool_id": 20,
+      "filename": "20.png",
+      "src": "/common/users/bz362/RIGID/gen_images/ImageNet256/Imagenet256-LDM/614/26144.png",
+      "generator": "LDM",
+      "imagenet_class": "614",
+      "mdmf_score": -6.7252,
+      "mdmf_predicted": "fake",
+      "distinctness": 0.647,
+      "cam_max": 0.736
+    }
+  ]
+}
