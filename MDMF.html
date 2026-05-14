@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Micro-Defects Expose Macro-Fakes: AI Image Detection</title>
-  <meta name="description" content="Select a candidate image for instant AI likelihood analysis.">
-  <meta name="keywords" content="AI image detector, AI-generated media, detect deepfake, MDMF">
+  <meta name="description" content="Upload any JPG, PNG, MP4 or MOV file for instant AI likelihood analysis.">
+  <meta name="keywords" content="AI image detector, AI video detector, AI-generated media, detect deepfake">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,54 +29,31 @@
   </script>
   <style>
     body { font-family: 'DM Sans', system-ui, sans-serif; background: #f8fafc; }
-
-    .cand-thumb {
-      position: relative; border-radius: 12px; overflow: hidden; cursor: pointer;
-      border: 3px solid transparent;
-      transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-      aspect-ratio: 1;
-    }
-    .cand-thumb:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-    .cand-thumb.selected {
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16,185,129,0.2), 0 4px 12px rgba(0,0,0,0.08);
-    }
-    .cand-thumb .check-badge {
-      position: absolute; top: 6px; right: 6px; width: 24px; height: 24px;
-      background: #10b981; border-radius: 50%; display: none;
-      align-items: center; justify-content: center; color: white; font-size: 14px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-    .cand-thumb.selected .check-badge { display: flex; }
-    .cand-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .cand-thumb .cand-label {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 4px 8px; background: linear-gradient(transparent, rgba(0,0,0,0.6));
-      color: white; font-size: 11px; font-weight: 600;
+    .drop-zone.is-dragging {
+      border-color: #10b981 !important;
+      background-color: #ecfdf5 !important;
+      transform: scale(1.005);
     }
 
-    .tab-btn {
-      padding: 8px 20px; font-size: 13px; font-weight: 600; border-radius: 9999px;
-      border: 1.5px solid #e2e8f0; background: white; color: #64748b; cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .tab-btn:hover { border-color: #cbd5e1; color: #334155; }
-    .tab-btn.active { background: #0f172a; color: white; border-color: #0f172a; }
-
+    /* Score track */
     .score-track {
       position: relative; height: 10px;
       background: linear-gradient(to right, #10b981 0%, #fbbf24 50%, #ef4444 100%);
       border-radius: 5px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
     }
     .score-track .threshold-mark {
-      position: absolute; top: -6px; width: 2px; height: 22px; background: #1e293b; border-radius: 1px;
+      position: absolute; top: -6px; width: 2px; height: 22px;
+      background: #1e293b; border-radius: 1px;
     }
     .score-track .score-dot {
       position: absolute; top: -5px; width: 20px; height: 20px;
-      background: white; border: 3px solid #1e293b; border-radius: 50%; transform: translateX(-50%);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.18); transition: left 0.4s cubic-bezier(0.4,0,0.2,1);
+      background: white; border: 3px solid #1e293b; border-radius: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+      transition: left 0.4s cubic-bezier(0.4,0,0.2,1);
     }
 
+    /* Range slider */
     input[type="range"].sens {
       -webkit-appearance: none; height: 6px;
       background: linear-gradient(to right, #334155 0%, #10b981 50%, #f59e0b 100%);
@@ -87,134 +64,151 @@
       background: white; border: 2px solid #10b981; cursor: pointer;
       box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
-    input[type="range"].sens::-webkit-slider-thumb:hover { box-shadow: 0 2px 8px rgba(16,185,129,0.4); }
+    input[type="range"].sens::-webkit-slider-thumb:hover {
+      box-shadow: 0 2px 8px rgba(16,185,129,0.4);
+    }
     input[type="range"].sens::-moz-range-thumb {
-      width: 20px; height: 20px; border-radius: 50%; background: white; border: 2px solid #10b981; cursor: pointer;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: white; border: 2px solid #10b981; cursor: pointer;
     }
 
+    /* Tooltips */
     .tip { position: relative; display: inline-flex; align-items: center; cursor: help; }
     .tip .tip-body {
       visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 8px);
       left: 50%; transform: translateX(-50%); width: 260px; padding: 10px 12px;
-      background: #0f172a; color: #e2e8f0; font-size: 12px; font-weight: 400; line-height: 1.5;
-      border-radius: 8px; z-index: 60; text-align: left; pointer-events: none;
-      transition: opacity 0.15s ease, visibility 0.15s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      background: #0f172a; color: #e2e8f0; font-size: 12px; font-weight: 400;
+      line-height: 1.5; border-radius: 8px; z-index: 60; text-align: left;
+      pointer-events: none; transition: opacity 0.15s ease, visibility 0.15s ease;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
     .tip .tip-body::after {
-      content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-      border: 6px solid transparent; border-top-color: #0f172a;
+      content: ''; position: absolute; top: 100%; left: 50%;
+      transform: translateX(-50%); border: 6px solid transparent; border-top-color: #0f172a;
     }
     .tip:hover .tip-body, .tip:focus-within .tip-body { visibility: visible; opacity: 1; }
 
-    @keyframes fadeSlideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    /* Animations */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     .animate-in { animation: fadeSlideUp 0.35s cubic-bezier(0.4,0,0.2,1) forwards; }
-    @keyframes btnPulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+    @keyframes btnPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
     .btn-loading { animation: btnPulse 1.2s ease-in-out infinite; }
-    .header-logo { height: 36px; width: auto; border-radius: 8px; }
+
+    .header-logo { height: 44px; width: auto; border-radius: 8px; }
   </style>
 </head>
 <body>
 <div id="root">
 <div class="min-h-screen flex flex-col">
 
-  <!-- HEADER -->
+  <!-- ==================== HEADER ==================== -->
   <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-surface-200/60">
     <div class="max-w-5xl mx-auto px-6 flex items-center justify-between h-[64px]">
       <a href="#upload" class="flex items-center gap-3 cursor-pointer group">
-        <img src="MDMF_logo.jpg" alt="MDMF Logo" class="header-logo">
+        <img src="MDMF_files/MDMF_logo.jpg" alt="MDMF Logo" class="header-logo">
         <span class="text-[16px] font-bold tracking-tight text-surface-800 group-hover:text-brand-600 transition-colors">
           MDMF<span class="text-brand-500">AI</span>
         </span>
       </a>
       <nav class="hidden md:flex items-center gap-8">
-        <a href="#upload" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">Detect</a>
-        <a href="#how-it-works" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">How It Works</a>
+        <a href="#upload" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">Upload</a>
+        <a href="https://google.com" target="_blank" rel="noopener" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">How It Works</a>
         <a href="#about" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">About</a>
       </nav>
       <a href="#upload" class="hidden md:inline-flex px-5 py-2 text-[13px] font-semibold text-white bg-brand-500 hover:bg-brand-600 rounded-full transition-all hover:shadow-lg hover:shadow-brand-500/20">
-        Try it
+        Try for free
       </a>
     </div>
   </header>
 
-  <!-- MAIN -->
+  <!-- ==================== MAIN ==================== -->
   <main class="flex-1">
-    <section id="upload" class="min-h-screen flex flex-col items-center px-4 pt-[88px] pb-24">
+    <section id="upload" class="min-h-screen flex flex-col justify-center items-center px-4 pt-[80px] pb-24">
 
       <!-- Hero -->
       <div class="text-center mb-10 max-w-2xl">
         <span class="inline-block px-3 py-1 text-[11px] font-semibold tracking-[0.15em] uppercase text-brand-600 bg-brand-50 rounded-full mb-5 border border-brand-200/40">
-          AI Image Detector
+          AI Media Detector
         </span>
         <h1 class="text-4xl md:text-5xl font-extrabold text-surface-900 leading-[1.15] tracking-tight mb-4">
-          Is this image<br><span class="text-brand-500">AI-generated?</span>
+          Is this image or video<br>
+          <span class="text-brand-500">AI-generated?</span>
         </h1>
         <p class="text-[16px] text-surface-500 leading-relaxed max-w-lg mx-auto">
-          Select a candidate image from our curated pool, then run MDMF analysis
-          to see its forensic score, heatmap, and per-model breakdown.
+          Upload any image or video for instant AI-likelihood scoring,
+          forensic heatmaps, and a detailed per-model breakdown.
         </p>
       </div>
 
-      <!-- IMAGE SELECTION CARD -->
-      <div class="w-full max-w-3xl rounded-2xl border border-surface-200 bg-white shadow-sm overflow-hidden">
-        <div class="px-6 py-4 bg-surface-50/80 border-b border-surface-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div>
-            <p class="text-[11px] font-bold tracking-[0.15em] uppercase text-surface-500">Select an Image</p>
-            <p class="text-xs text-surface-400 mt-0.5">Choose one from the candidate pool to analyze</p>
+      <!-- ========== DROP ZONE ========== -->
+      <div id="dropZone"
+           class="drop-zone w-full max-w-2xl rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer bg-white border-surface-200 hover:border-brand-400 hover:bg-brand-50/30 shadow-sm">
+        <input id="fileInput" accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.mov,.webm" class="hidden" type="file">
+        <div class="flex flex-col items-center justify-center py-16 px-8 text-center select-none pointer-events-none">
+          <div class="w-16 h-16 flex items-center justify-center rounded-2xl bg-brand-50 border border-brand-200/50 mb-5">
+            <i class="ri-upload-cloud-2-line text-3xl text-brand-500"></i>
           </div>
-          <div class="flex gap-2">
-            <button class="tab-btn active" data-tab="all" onclick="switchTab('all')">All</button>
-            <button class="tab-btn" data-tab="real" onclick="switchTab('real')">Real</button>
-            <button class="tab-btn" data-tab="fake" onclick="switchTab('fake')">AI-Generated</button>
+          <p class="text-[16px] font-semibold text-surface-700 mb-1">Drop your image or video here</p>
+          <p class="text-sm text-surface-400 mb-6">or click to browse from your device</p>
+          <div class="flex flex-wrap justify-center gap-2">
+            <span class="px-2.5 py-1 text-[11px] font-medium text-surface-500 bg-surface-100 rounded-md">JPG</span>
+            <span class="px-2.5 py-1 text-[11px] font-medium text-surface-500 bg-surface-100 rounded-md">PNG</span>
+            <span class="px-2.5 py-1 text-[11px] font-medium text-surface-500 bg-surface-100 rounded-md">WebP</span>
+            <span class="px-2.5 py-1 text-[11px] font-medium text-surface-500 bg-surface-100 rounded-md">MP4</span>
+            <span class="px-2.5 py-1 text-[11px] font-medium text-surface-500 bg-surface-100 rounded-md">MOV</span>
+            <span class="px-2.5 py-1 text-[11px] font-medium text-surface-500 bg-surface-100 rounded-md">WebM</span>
           </div>
-        </div>
-        <div class="px-6 py-5">
-          <div id="imageGrid" class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3"></div>
-          <p class="text-[11px] text-surface-400 mt-4 text-center">
-            <span id="poolCount">40</span> candidate images &middot;
-            <span id="selectedLabel" class="font-semibold text-surface-500">None selected</span>
-          </p>
+          <p class="text-[11px] text-surface-400 mt-4">Max file size: 100 MB</p>
         </div>
       </div>
 
-      <!-- SELECTED PREVIEW -->
-      <div id="previewCard" class="hidden w-full max-w-3xl mt-5 rounded-2xl border border-surface-200 bg-white shadow-sm p-5">
-        <div class="flex items-center gap-5">
-          <div id="previewThumb" class="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden bg-surface-100"></div>
+      <!-- ========== PREVIEW ========== -->
+      <div id="previewCard" class="hidden w-full max-w-2xl mt-5 rounded-2xl border border-surface-200 bg-white p-5 shadow-sm">
+        <div class="flex items-start gap-4">
+          <div id="previewMedia" class="flex-shrink-0 w-28 h-28 rounded-xl overflow-hidden bg-surface-100 flex items-center justify-center"></div>
           <div class="flex-1 min-w-0">
-            <p id="previewName" class="text-[15px] font-semibold text-surface-900"></p>
-            <p id="previewMeta" class="text-xs text-surface-500 mt-1"></p>
+            <p id="fileName" class="text-[15px] font-semibold text-surface-900 truncate"></p>
+            <p id="fileMeta" class="text-xs text-surface-500 mt-1"></p>
+            <button id="removeBtn" type="button"
+                    class="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-surface-500 hover:text-rose-600 transition-colors">
+              <i class="ri-close-circle-line text-sm"></i> Remove file
+            </button>
           </div>
-          <button id="clearSelection" class="text-xs font-medium text-surface-500 hover:text-rose-600 transition-colors flex items-center gap-1">
-            <i class="ri-close-circle-line text-sm"></i> Clear
-          </button>
         </div>
       </div>
 
-      <!-- ANALYSIS SETTINGS -->
-      <div class="w-full max-w-3xl mt-5 rounded-2xl border border-surface-200 bg-white shadow-sm overflow-hidden">
+      <!-- ========== ANALYSIS SETTINGS ========== -->
+      <div class="w-full max-w-2xl mt-5 rounded-2xl border border-surface-200 bg-white shadow-sm overflow-hidden">
         <div class="px-6 py-4 bg-surface-50/80 border-b border-surface-100">
           <p class="text-[11px] font-bold tracking-[0.15em] uppercase text-surface-500">Analysis Settings</p>
         </div>
         <div class="px-6 py-5 space-y-6">
+
+          <!-- Variant dropdown -->
           <div>
             <label class="flex items-center gap-1.5 text-sm font-semibold text-surface-700 mb-2.5">
               Detector Model
               <span class="tip" tabindex="0">
                 <i class="ri-information-line text-surface-400 text-sm"></i>
                 <span class="tip-body">
+                  Each model was trained against a different family of generators.
                   <strong>ImageNet</strong> covers older GANs and diffusion models (ADM, LDM).
-                  <strong>SDv1.4</strong> is tuned for Stable Diffusion family.
-                  <strong>Both</strong> runs both for a consensus verdict.
+                  <strong>SDv1.4</strong> is tuned for the Stable Diffusion family.
+                  <strong>Both</strong> runs both and gives a consensus verdict.
                 </span>
               </span>
             </label>
             <select id="variantMode" class="w-full px-4 py-2.5 text-sm text-surface-700 border border-surface-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-400 transition-all">
-              <option value="both">Both models — consensus verdict</option>
-              <option value="imagenet">ImageNet model — older generators (GANs, ADM, LDM)</option>
-              <option value="sdv14">SDv1.4 model — Stable Diffusion family</option>
+              <option value="both">Both models &mdash; consensus verdict</option>
+              <option value="imagenet">ImageNet model &mdash; older generators (GANs, ADM, LDM)</option>
+              <option value="sdv14">SDv1.4 model &mdash; Stable Diffusion family</option>
             </select>
           </div>
+
+          <!-- Sensitivity slider -->
           <div>
             <div class="flex items-center justify-between mb-2.5">
               <label class="flex items-center gap-1.5 text-sm font-semibold text-surface-700">
@@ -222,9 +216,10 @@
                 <span class="tip" tabindex="0">
                   <i class="ri-information-line text-surface-400 text-sm"></i>
                   <span class="tip-body">
-                    Adjusts the decision threshold (&tau;). <strong>Strict</strong> = only obvious fakes flagged.
-                    <strong>Lenient</strong> = catches borderline cases but more false alarms.
-                    The displayed percentage shifts with this slider since the cutoff is moving.
+                    Adjusts the decision threshold (&tau;). <strong>Strict</strong> raises the bar &mdash;
+                    only obvious fakes flagged. <strong>Lenient</strong> lowers it, catching borderline
+                    cases at the cost of more false alarms. The displayed percentage will shift
+                    with this slider since the cutoff is moving.
                   </span>
                 </span>
               </label>
@@ -232,23 +227,34 @@
             </div>
             <input id="sensitivity" type="range" min="0" max="100" value="50" class="sens w-full">
             <div class="flex justify-between text-[11px] text-surface-400 mt-2">
-              <span>Strict — fewer false alarms</span>
-              <span>Lenient — catches borderline fakes</span>
+              <span>Strict &mdash; fewer false alarms</span>
+              <span>Lenient &mdash; catches borderline fakes</span>
             </div>
           </div>
+
         </div>
       </div>
 
-      <p id="errorMsg" class="hidden mt-4 text-sm font-medium text-rose-600 bg-rose-50 px-4 py-2 rounded-lg border border-rose-200/60"></p>
+      <!-- Error -->
+      <p id="errorMsg" class="hidden mt-4 text-sm font-medium text-rose-600 bg-rose-50 px-4 py-2.5 rounded-lg border border-rose-200/60"></p>
 
+      <!-- Analyze button -->
       <button id="analyzeBtn" disabled
               class="mt-6 px-12 py-4 text-[15px] font-bold text-white rounded-full transition-all duration-200 whitespace-nowrap bg-surface-200 text-surface-400 cursor-not-allowed shadow-none">
-        Analyze Image
+        Analyze Media
       </button>
-      <p class="mt-3 text-[11px] text-surface-400">Images processed in the cloud and discarded immediately.</p>
 
-      <!-- RESULT CARD -->
-      <div id="resultCard" class="hidden mt-8 w-full max-w-3xl rounded-2xl border border-surface-200 bg-white shadow-sm overflow-hidden">
+      <p class="mt-3 text-[11px] text-surface-400">
+        Your file is processed in the cloud and discarded immediately &mdash; never stored.
+      </p>
+
+      <!-- Visit counter -->
+      <p id="visitCounter" class="mt-2 text-[11px] text-surface-400"></p>
+
+      <!-- ========== RESULT CARD ========== -->
+      <div id="resultCard" class="hidden mt-8 w-full max-w-2xl rounded-2xl border border-surface-200 bg-white shadow-sm overflow-hidden">
+
+        <!-- Verdict banner -->
         <div id="verdictBanner" class="px-6 py-5">
           <div class="flex items-center justify-between">
             <div>
@@ -258,9 +264,15 @@
             <div id="verdictBadge" class="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold"></div>
           </div>
         </div>
+
         <div class="border-t border-surface-100"></div>
+
+        <!-- Per-variant breakdowns -->
         <div id="variantBreakdown" class="px-6 py-5 space-y-4"></div>
+
         <div class="border-t border-surface-100"></div>
+
+        <!-- Heatmap section -->
         <div class="px-6 py-5">
           <button id="toggleOverlay" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors">
             <i class="ri-eye-line text-base"></i>
@@ -273,17 +285,20 @@
           </p>
         </div>
       </div>
+
     </section>
   </main>
 
-  <!-- FOOTER -->
+  <!-- ==================== FOOTER ==================== -->
   <footer class="bg-surface-900 text-surface-300 py-8 px-6">
     <div class="max-w-5xl mx-auto text-center">
       <div class="flex items-center justify-center gap-2 mb-3">
-        <img src="MDMF_logo.jpg" alt="MDMF Logo" class="h-6 w-auto rounded opacity-70">
+        <img src="MDMF_files/MDMF_logo.jpg" alt="MDMF Logo" class="h-6 w-auto rounded opacity-70">
         <span class="text-sm font-semibold text-surface-500">MDMF<span class="text-brand-500">AI</span></span>
       </div>
-      <p class="text-[11px] text-surface-500">&copy; 2026 MDMF Team. All rights reserved.</p>
+      <p class="text-[11px] text-surface-500">
+        &copy; 2026 MDMF Team. All rights reserved.
+      </p>
     </div>
   </footer>
 
@@ -292,143 +307,57 @@
 
 <script>
 // ================================================================
-// CANDIDATE POOL
+// State & Config
 // ================================================================
-const POOL_BASE = 'candidate_pool';
-const MANIFEST = {
-  real: Array.from({length:20}, (_,i) => ({ pool_id: i+1, filename: `${i+1}.png` })),
-  fake: Array.from({length:20}, (_,i) => ({ pool_id: i+1, filename: `${i+1}.png` })),
-};
-
-// ================================================================
-// STATE
-// ================================================================
-let selectedImage = null;
-let currentTab = 'all';
+let currentFile = null;
+const MAX_BYTES = 100 * 1024 * 1024;
+const ALLOWED_TYPES = [
+  'image/jpeg','image/png','image/webp','image/gif',
+  'video/mp4','video/quicktime','video/webm'
+];
 const API_URL = 'https://kchromatic3-mdmf-api.hf.space/detect';
 
 // ================================================================
-// REFS
+// Element refs
 // ================================================================
-const imageGrid = document.getElementById('imageGrid');
-const poolCount = document.getElementById('poolCount');
-const selectedLabel = document.getElementById('selectedLabel');
-const previewCard = document.getElementById('previewCard');
-const previewThumb = document.getElementById('previewThumb');
-const previewName = document.getElementById('previewName');
-const previewMeta = document.getElementById('previewMeta');
-const clearSelBtn = document.getElementById('clearSelection');
-const analyzeBtn = document.getElementById('analyzeBtn');
-const errorMsg = document.getElementById('errorMsg');
-const resultCard = document.getElementById('resultCard');
-const resultText = document.getElementById('resultText');
-const verdictBanner = document.getElementById('verdictBanner');
-const verdictBadge = document.getElementById('verdictBadge');
-const sensitivityEl = document.getElementById('sensitivity');
+const dropZone     = document.getElementById('dropZone');
+const fileInput    = document.getElementById('fileInput');
+const previewCard  = document.getElementById('previewCard');
+const previewMedia = document.getElementById('previewMedia');
+const fileNameEl   = document.getElementById('fileName');
+const fileMetaEl   = document.getElementById('fileMeta');
+const removeBtn    = document.getElementById('removeBtn');
+const analyzeBtn   = document.getElementById('analyzeBtn');
+const errorMsg     = document.getElementById('errorMsg');
+const resultCard   = document.getElementById('resultCard');
+const resultText   = document.getElementById('resultText');
+const verdictBanner  = document.getElementById('verdictBanner');
+const verdictBadge   = document.getElementById('verdictBadge');
+const sensitivityEl  = document.getElementById('sensitivity');
 const sensValueLabel = document.getElementById('sensValueLabel');
-const variantMode = document.getElementById('variantMode');
+const variantMode    = document.getElementById('variantMode');
 const variantBreakdown = document.getElementById('variantBreakdown');
-const toggleOverlay = document.getElementById('toggleOverlay');
+const toggleOverlay    = document.getElementById('toggleOverlay');
 const toggleOverlayLbl = document.getElementById('toggleOverlayLabel');
-const overlayGrid = document.getElementById('overlayGrid');
-const overlayHelp = document.getElementById('overlayHelp');
+const overlayGrid      = document.getElementById('overlayGrid');
+const overlayHelp      = document.getElementById('overlayHelp');
 
 // ================================================================
-// GRID
-// ================================================================
-// Seeded shuffle so the order is random but stable per page load
-function shuffleArray(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function buildGrid() {
-  imageGrid.innerHTML = '';
-  let items = [];
-  if (currentTab === 'all' || currentTab === 'real') {
-    MANIFEST.real.forEach(img => items.push({ type:'real', ...img, path:`${POOL_BASE}/real/${img.filename}` }));
-  }
-  if (currentTab === 'all' || currentTab === 'fake') {
-    MANIFEST.fake.forEach(img => items.push({ type:'fake', ...img, path:`${POOL_BASE}/fake/${img.filename}` }));
-  }
-  if (currentTab === 'all') items = shuffleArray(items);
-
-  poolCount.textContent = items.length;
-
-  items.forEach(item => {
-    const key = `${item.type}-${item.pool_id}`;
-    const isSel = selectedImage && selectedImage.type === item.type && selectedImage.pool_id === item.pool_id;
-    const div = document.createElement('div');
-    div.className = 'cand-thumb' + (isSel ? ' selected' : '');
-    div.dataset.key = key;
-    div.onclick = () => selectImage(item);
-    div.innerHTML = `
-      <img src="${item.path}" alt="Candidate ${item.type} #${item.pool_id}" loading="lazy">
-      <div class="check-badge"><i class="ri-check-line"></i></div>
-      <div class="cand-label">#${item.pool_id}</div>
-    `;
-    imageGrid.appendChild(div);
-  });
-}
-
-// ================================================================
-// SELECT / CLEAR
-// ================================================================
-function selectImage(item) {
-  if (selectedImage && selectedImage.type === item.type && selectedImage.pool_id === item.pool_id) {
-    clearSelectedImage(); return;
-  }
-  selectedImage = item;
-  document.querySelectorAll('.cand-thumb').forEach(el => {
-    el.classList.toggle('selected', el.dataset.key === `${item.type}-${item.pool_id}`);
-  });
-  previewCard.classList.remove('hidden');
-  previewThumb.innerHTML = `<img src="${item.path}" class="w-full h-full object-cover rounded-xl" alt="Selected">`;
-  previewName.textContent = `Image #${item.pool_id}`;
-  previewMeta.textContent = `${item.filename} · candidate_pool/${item.type}/`;
-  selectedLabel.innerHTML = `Selected: <strong>#${item.pool_id}</strong>`;
-  analyzeBtn.disabled = false;
-  analyzeBtn.classList.remove('bg-surface-200','text-surface-400','cursor-not-allowed','shadow-none');
-  analyzeBtn.classList.add('bg-brand-500','hover:bg-brand-600','cursor-pointer','shadow-lg','shadow-brand-500/20');
-  resultCard.classList.add('hidden');
-  previewCard.scrollIntoView({ behavior:'smooth', block:'nearest' });
-}
-
-function clearSelectedImage() {
-  selectedImage = null;
-  document.querySelectorAll('.cand-thumb').forEach(el => el.classList.remove('selected'));
-  previewCard.classList.add('hidden');
-  resultCard.classList.add('hidden');
-  selectedLabel.textContent = 'None selected';
-  analyzeBtn.disabled = true;
-  analyzeBtn.classList.add('bg-surface-200','text-surface-400','cursor-not-allowed','shadow-none');
-  analyzeBtn.classList.remove('bg-brand-500','hover:bg-brand-600','cursor-pointer','shadow-lg','shadow-brand-500/20');
-}
-clearSelBtn.addEventListener('click', clearSelectedImage);
-
-// ================================================================
-// TABS
-// ================================================================
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
-  buildGrid();
-}
-
-// ================================================================
-// SENSITIVITY
+// Sensitivity label
 // ================================================================
 sensitivityEl.addEventListener('input', (e) => {
   const v = parseInt(e.target.value, 10);
-  sensValueLabel.textContent = v < 20 ? 'Very Strict' : v < 40 ? 'Cautious' : v <= 60 ? 'Balanced' : v < 80 ? 'Permissive' : 'Lenient';
+  let label;
+  if      (v < 20) label = 'Very Strict';
+  else if (v < 40) label = 'Cautious';
+  else if (v <= 60) label = 'Balanced';
+  else if (v < 80) label = 'Permissive';
+  else             label = 'Lenient';
+  sensValueLabel.textContent = label;
 });
 
 // ================================================================
-// HEATMAP TOGGLE
+// Heatmap toggle
 // ================================================================
 toggleOverlay.addEventListener('click', () => {
   const hidden = overlayGrid.classList.contains('hidden');
@@ -438,126 +367,275 @@ toggleOverlay.addEventListener('click', () => {
 });
 
 // ================================================================
-// ANALYZE
+// File handling
 // ================================================================
-analyzeBtn.addEventListener('click', () => { if (selectedImage) runDetection(); });
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (file) handleFile(file);
+});
+['dragenter','dragover'].forEach(evt => {
+  dropZone.addEventListener(evt, (e) => {
+    e.preventDefault(); e.stopPropagation();
+    dropZone.classList.add('is-dragging');
+  });
+});
+['dragleave','drop'].forEach(evt => {
+  dropZone.addEventListener(evt, (e) => {
+    e.preventDefault(); e.stopPropagation();
+    dropZone.classList.remove('is-dragging');
+  });
+});
+dropZone.addEventListener('drop', (e) => {
+  const file = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+removeBtn.addEventListener('click', resetUpload);
+analyzeBtn.addEventListener('click', () => { if (currentFile) runDetection(currentFile); });
 
-async function runDetection() {
+function handleFile(file) {
+  clearError();
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    showError('Unsupported file type: ' + (file.type || 'unknown') + '.');
+    return;
+  }
+  if (file.size > MAX_BYTES) {
+    showError('File too large (' + formatBytes(file.size) + '). Max 100 MB.');
+    return;
+  }
+  currentFile = file;
+  dropZone.classList.add('hidden');
+  previewCard.classList.remove('hidden');
+  resultCard.classList.add('hidden');
+  fileNameEl.textContent = file.name;
+  fileMetaEl.textContent = (file.type || 'unknown') + ' \u00B7 ' + formatBytes(file.size);
+  renderPreview(file);
+  analyzeBtn.disabled = false;
+  analyzeBtn.classList.remove('bg-surface-200','text-surface-400','cursor-not-allowed','shadow-none');
+  analyzeBtn.classList.add('bg-brand-500','hover:bg-brand-600','cursor-pointer','shadow-lg','shadow-brand-500/20');
+}
+
+function renderPreview(file) {
+  if (previewMedia.dataset.objectUrl) URL.revokeObjectURL(previewMedia.dataset.objectUrl);
+  var url = URL.createObjectURL(file);
+  previewMedia.dataset.objectUrl = url;
+  previewMedia.innerHTML = '';
+  if (file.type.startsWith('image/')) {
+    var img = document.createElement('img');
+    img.src = url; img.alt = file.name; img.className = 'w-full h-full object-cover';
+    previewMedia.appendChild(img);
+  } else if (file.type.startsWith('video/')) {
+    var vid = document.createElement('video');
+    vid.src = url; vid.muted = true; vid.controls = false; vid.className = 'w-full h-full object-cover';
+    previewMedia.appendChild(vid);
+  }
+}
+
+function resetUpload() {
+  currentFile = null;
+  fileInput.value = '';
+  if (previewMedia.dataset.objectUrl) {
+    URL.revokeObjectURL(previewMedia.dataset.objectUrl);
+    delete previewMedia.dataset.objectUrl;
+  }
+  previewMedia.innerHTML = '';
+  dropZone.classList.remove('hidden');
+  previewCard.classList.add('hidden');
+  resultCard.classList.add('hidden');
+  clearError();
   analyzeBtn.disabled = true;
-  analyzeBtn.innerHTML = '<span class="btn-loading inline-block">Analyzing&hellip;</span>';
+  analyzeBtn.classList.add('bg-surface-200','text-surface-400','cursor-not-allowed','shadow-none');
+  analyzeBtn.classList.remove('bg-brand-500','hover:bg-brand-600','cursor-pointer','shadow-lg','shadow-brand-500/20');
+}
+
+// ================================================================
+// Detection
+// ================================================================
+async function runDetection(file) {
+  analyzeBtn.disabled = true;
+  analyzeBtn.innerHTML = '<span class="btn-loading inline-block">Analyzing\u2026</span>';
   resultCard.classList.add('hidden');
   clearError();
 
   try {
-    const imgRes = await fetch(selectedImage.path);
-    if (!imgRes.ok) throw new Error(`Could not load image: ${selectedImage.path}`);
-    const blob = await imgRes.blob();
-
-    const formData = new FormData();
-    formData.append('file', blob, selectedImage.filename);
+    var formData = new FormData();
+    formData.append('file', file);
     formData.append('sensitivity', (parseInt(sensitivityEl.value, 10) / 100).toString());
     formData.append('mode', variantMode.value);
 
-    const res = await fetch(API_URL, { method:'POST', body: formData });
+    var res = await fetch(API_URL, { method: 'POST', body: formData });
     if (!res.ok) {
-      let msg = `Server responded ${res.status}`;
-      try { const b = await res.json(); if (b && b.detail) msg = b.detail; } catch(_){}
+      var msg = 'Server responded ' + res.status;
+      try { var body = await res.json(); if (body && body.detail) msg = body.detail; } catch (_) {}
       throw new Error(msg);
     }
-    renderResult(await res.json());
+    var data = await res.json();
+    renderResult(data);
   } catch (err) {
-    showError(`Analysis failed: ${err.message}`);
+    showError('Analysis failed: ' + err.message + '. Is the API running?');
   } finally {
     analyzeBtn.disabled = false;
-    analyzeBtn.textContent = 'Analyze Image';
+    analyzeBtn.textContent = 'Analyze Media';
   }
 }
 
 // ================================================================
-// RENDER RESULT
+// Render result
 // ================================================================
 function renderResult(data) {
-  const isFake = data.label === 'fake', isReal = data.label === 'real';
-  const word = isFake ? 'Likely AI-Generated' : isReal ? 'Likely Authentic' : 'Inconclusive';
-  const pct = data.score_percent != null ? `${data.score_percent.toFixed(1)}%` : '—';
+  var isFake  = data.label === 'fake';
+  var isReal  = data.label === 'real';
+  var verdictWord = isFake ? 'Likely AI-Generated' : isReal ? 'Likely Authentic' : 'Inconclusive';
+  var pctText = data.score_percent != null ? data.score_percent.toFixed(1) + '%' : '\u2014';
 
-  resultText.innerHTML = `<span class="${isFake?'text-rose-600':isReal?'text-brand-600':'text-amber-600'}">${word}</span>` +
-    (data.score_percent != null ? `<span class="text-surface-400 font-normal text-base ml-2">${pct} AI-likelihood</span>` : '');
+  resultText.innerHTML =
+    '<span class="' + (isFake ? 'text-rose-600' : isReal ? 'text-brand-600' : 'text-amber-600') + '">' + verdictWord + '</span>' +
+    (data.score_percent != null
+      ? '<span class="text-surface-400 font-normal text-base ml-2">' + pctText + ' AI-likelihood</span>'
+      : '');
+
+  // Badge
   verdictBadge.className = 'flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold ' +
-    (isFake?'bg-rose-500':isReal?'bg-brand-500':'bg-amber-500');
-  verdictBadge.innerHTML = isFake?'<i class="ri-alert-line"></i>':isReal?'<i class="ri-check-line"></i>':'<i class="ri-question-line"></i>';
-  verdictBanner.className = 'px-6 py-5 ' + (isFake?'bg-rose-50/50':isReal?'bg-brand-50/50':'bg-amber-50/50');
+    (isFake ? 'bg-rose-500' : isReal ? 'bg-brand-500' : 'bg-amber-500');
+  verdictBadge.innerHTML = isFake
+    ? '<i class="ri-alert-line"></i>'
+    : isReal ? '<i class="ri-check-line"></i>'
+    : '<i class="ri-question-line"></i>';
 
+  // Banner tint
+  verdictBanner.className = 'px-6 py-5 ' +
+    (isFake ? 'bg-rose-50/50' : isReal ? 'bg-brand-50/50' : 'bg-amber-50/50');
+
+  // Per-variant breakdown
   variantBreakdown.innerHTML = '';
-  const names = { imagenet:'ImageNet Model', sdv14:'SDv1.4 Model' };
-  const descs = { imagenet:'Older generators (GANs, ADM, LDM)', sdv14:'Stable Diffusion family' };
+  var names = { imagenet: 'ImageNet Model', sdv14: 'SDv1.4 Model' };
+  var descs = { imagenet: 'Older generators (GANs, ADM, LDM)', sdv14: 'Stable Diffusion family' };
 
-  for (const [key,v] of Object.entries(data.variants || {})) {
-    const rH = 10;
-    const dist = Math.max(-rH, Math.min(rH, v.distance_from_threshold));
-    const dotPct = ((dist+rH)/(2*rH))*100;
-    const vF = v.label==='fake';
-    const thrAdj = Math.abs(v.threshold - v.default_threshold) > 0.01
-      ? ` <span class="text-surface-400">(default: ${v.default_threshold.toFixed(2)})</span>` : '';
+  var variantKeys = Object.keys(data.variants || {});
+  for (var ki = 0; ki < variantKeys.length; ki++) {
+    var key = variantKeys[ki];
+    var v = data.variants[key];
+    var rangeHalf = 10;
+    var dist = Math.max(-rangeHalf, Math.min(rangeHalf, v.distance_from_threshold));
+    var dotPct = ((dist + rangeHalf) / (2 * rangeHalf)) * 100;
+    var vFake = v.label === 'fake';
+    var thrAdj = Math.abs(v.threshold - v.default_threshold) > 0.01
+      ? ' <span class="text-surface-400">(default: ' + v.default_threshold.toFixed(2) + ')</span>' : '';
 
-    const bl = document.createElement('div');
-    bl.className = 'rounded-xl border border-surface-100 bg-surface-50/60 p-5 animate-in';
-    bl.innerHTML = `
-      <div class="flex items-start justify-between mb-4">
-        <div><p class="text-sm font-bold text-surface-800">${names[key]||key}</p>
-        <p class="text-[11px] text-surface-400 mt-0.5">${descs[key]||''}</p></div>
-        <span class="px-3 py-1 text-xs font-bold rounded-full ${vF?'bg-rose-100 text-rose-700':'bg-brand-100 text-brand-700'}">${v.label.toUpperCase()}</span>
-      </div>
-      <div class="score-track mb-3"><div class="threshold-mark" style="left:50%"></div><div class="score-dot" style="left:${dotPct}%"></div></div>
-      <div class="flex justify-between text-[11px] text-surface-400 mb-4">
-        <span>&larr; Real</span><span>&tau; = ${v.threshold.toFixed(2)}${thrAdj}</span><span>Fake &rarr;</span>
-      </div>
-      <div class="grid grid-cols-3 gap-3">
-        <div class="bg-white rounded-lg px-3 py-2 border border-surface-100">
-          <p class="text-[10px] font-semibold text-surface-400 uppercase tracking-wider mb-0.5">Raw Score</p>
-          <p class="text-sm font-mono font-semibold text-surface-800">${v.score.toFixed(3)}</p>
-        </div>
-        <div class="bg-white rounded-lg px-3 py-2 border border-surface-100">
-          <p class="text-[10px] font-semibold text-surface-400 uppercase tracking-wider mb-0.5">Distance</p>
-          <p class="text-sm font-mono font-semibold ${v.distance_from_threshold>0?'text-rose-600':'text-brand-600'}">
-            ${v.distance_from_threshold>0?'+':''}${v.distance_from_threshold.toFixed(3)}</p>
-        </div>
-        <div class="bg-white rounded-lg px-3 py-2 border border-surface-100">
-          <p class="text-[10px] font-semibold text-surface-400 uppercase tracking-wider mb-0.5">AI %</p>
-          <p class="text-sm font-semibold text-surface-800">${v.score_percent.toFixed(1)}%</p>
-        </div>
-      </div>`;
-    variantBreakdown.appendChild(bl);
+    var block = document.createElement('div');
+    block.className = 'rounded-xl border border-surface-100 bg-surface-50/60 p-5 animate-in';
+    block.innerHTML =
+      '<div class="flex items-start justify-between mb-4">' +
+        '<div>' +
+          '<p class="text-sm font-bold text-surface-800">' + (names[key] || key) + '</p>' +
+          '<p class="text-[11px] text-surface-400 mt-0.5">' + (descs[key] || '') + '</p>' +
+        '</div>' +
+        '<span class="px-3 py-1 text-xs font-bold rounded-full ' + (vFake ? 'bg-rose-100 text-rose-700' : 'bg-brand-100 text-brand-700') + '">' +
+          v.label.toUpperCase() +
+        '</span>' +
+      '</div>' +
+
+      '<div class="score-track mb-3">' +
+        '<div class="threshold-mark" style="left: 50%;"></div>' +
+        '<div class="score-dot" style="left: ' + dotPct + '%;"></div>' +
+      '</div>' +
+      '<div class="flex justify-between text-[11px] text-surface-400 mb-4">' +
+        '<span>&larr; Real</span>' +
+        '<span>&tau; = ' + v.threshold.toFixed(2) + thrAdj + '</span>' +
+        '<span>Fake &rarr;</span>' +
+      '</div>' +
+
+      '<div class="grid grid-cols-3 gap-3">' +
+        '<div class="bg-white rounded-lg px-3 py-2.5 border border-surface-100">' +
+          '<p class="text-[10px] font-semibold text-surface-400 uppercase tracking-wider mb-0.5">Raw Score</p>' +
+          '<p class="text-sm font-mono font-semibold text-surface-800">' + v.score.toFixed(3) + '</p>' +
+        '</div>' +
+        '<div class="bg-white rounded-lg px-3 py-2.5 border border-surface-100">' +
+          '<p class="text-[10px] font-semibold text-surface-400 uppercase tracking-wider mb-0.5">Distance</p>' +
+          '<p class="text-sm font-mono font-semibold ' + (v.distance_from_threshold > 0 ? 'text-rose-600' : 'text-brand-600') + '">' +
+            (v.distance_from_threshold > 0 ? '+' : '') + v.distance_from_threshold.toFixed(3) +
+          '</p>' +
+        '</div>' +
+        '<div class="bg-white rounded-lg px-3 py-2.5 border border-surface-100">' +
+          '<p class="text-[10px] font-semibold text-surface-400 uppercase tracking-wider mb-0.5">AI %</p>' +
+          '<p class="text-sm font-semibold text-surface-800">' + v.score_percent.toFixed(1) + '%</p>' +
+        '</div>' +
+      '</div>';
+    variantBreakdown.appendChild(block);
   }
 
+  // Heatmap overlays
   overlayGrid.innerHTML = '';
-  const wO = Object.entries(data.variants||{}).filter(([_,v])=>v.overlay_image);
-  overlayGrid.className = 'hidden mt-5 grid gap-4 ' + (wO.length>1?'grid-cols-2':'grid-cols-1');
-  for (const [key,v] of wO) {
-    const w = document.createElement('div');
-    w.innerHTML = `<p class="text-xs font-bold text-surface-700 mb-2">${names[key]||key}</p>
-      <img src="${v.overlay_image}" class="w-full rounded-xl border border-surface-200 shadow-sm" alt="Heatmap (${key})">`;
-    overlayGrid.appendChild(w);
+  var overlayEntries = [];
+  for (var oi = 0; oi < variantKeys.length; oi++) {
+    var okey = variantKeys[oi];
+    if (data.variants[okey].overlay_image) {
+      overlayEntries.push([okey, data.variants[okey]]);
+    }
   }
+  overlayGrid.className = 'hidden mt-5 grid gap-4 ' + (overlayEntries.length > 1 ? 'grid-cols-2' : 'grid-cols-1');
+
+  for (var hi = 0; hi < overlayEntries.length; hi++) {
+    var hkey = overlayEntries[hi][0];
+    var hv = overlayEntries[hi][1];
+    var wrap = document.createElement('div');
+    wrap.innerHTML =
+      '<p class="text-xs font-bold text-surface-700 mb-2">' + (names[hkey] || hkey) + '</p>' +
+      '<img src="' + hv.overlay_image + '" class="w-full rounded-xl border border-surface-200 shadow-sm" alt="Forensic heatmap (' + hkey + ')">';
+    overlayGrid.appendChild(wrap);
+  }
+
+  // Reset toggle
   overlayGrid.classList.add('hidden');
   overlayHelp.classList.add('hidden');
   toggleOverlayLbl.textContent = 'Show forensic heatmap';
 
   resultCard.classList.remove('hidden');
   resultCard.classList.add('animate-in');
-  resultCard.scrollIntoView({ behavior:'smooth', block:'start' });
+  resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // ================================================================
-// HELPERS
+// UI Helpers
 // ================================================================
-function showError(m) { errorMsg.textContent=m; errorMsg.classList.remove('hidden'); }
-function clearError()  { errorMsg.textContent=''; errorMsg.classList.add('hidden'); }
+function showError(msg) {
+  errorMsg.textContent = msg;
+  errorMsg.classList.remove('hidden');
+}
+function clearError() {
+  errorMsg.textContent = '';
+  errorMsg.classList.add('hidden');
+}
+function formatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
 
 // ================================================================
-// INIT
+// Visit counter
 // ================================================================
-buildGrid();
+(async function initVisitCounter() {
+  var el = document.getElementById('visitCounter');
+  try {
+    var count = 1;
+    var result = await window.storage.get('mdmf_visit_count');
+    if (result && result.value) {
+      count = parseInt(result.value, 10) + 1;
+    }
+    await window.storage.set('mdmf_visit_count', count.toString());
+    el.textContent = count.toLocaleString() + ' visit' + (count === 1 ? '' : 's');
+  } catch (e) {
+    // Fallback: window.storage not available (GitHub Pages, local file, etc.)
+    try {
+      var sc = parseInt(sessionStorage.getItem('mdmf_visits') || '0', 10) + 1;
+      sessionStorage.setItem('mdmf_visits', sc.toString());
+      el.textContent = sc.toLocaleString() + ' visit' + (sc === 1 ? '' : 's') + ' this session';
+    } catch (_) {
+      el.style.display = 'none';
+    }
+  }
+})();
 </script>
 </body>
 </html>
