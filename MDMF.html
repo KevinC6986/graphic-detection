@@ -110,7 +110,7 @@
     .animate-in { animation: fadeSlideUp 0.35s cubic-bezier(0.4,0,0.2,1) forwards; }
     @keyframes btnPulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
     .btn-loading { animation: btnPulse 1.2s ease-in-out infinite; }
-    .header-logo { height: 36px; width: auto; border-radius: 8px; }
+    .header-logo { height: 48px; width: auto; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -128,7 +128,7 @@
       </a>
       <nav class="hidden md:flex items-center gap-8">
         <a href="#upload" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">Detect</a>
-        <a href="#how-it-works" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">How It Works</a>
+        <a href="https://google.com" target="_blank" rel="noopener noreferrer" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">How It Works</a>
         <a href="#about" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">About</a>
       </nav>
       <a href="#upload" class="hidden md:inline-flex px-5 py-2 text-[13px] font-semibold text-white bg-brand-500 hover:bg-brand-600 rounded-full transition-all hover:shadow-lg hover:shadow-brand-500/20">
@@ -283,6 +283,7 @@
         <img src="MDMF_logo.jpg" alt="MDMF Logo" class="h-6 w-auto rounded opacity-70">
         <span class="text-sm font-semibold text-surface-500">MDMF<span class="text-brand-500">AI</span></span>
       </div>
+      <p class="text-[11px] text-surface-400 mb-1">Page visits: <span id="visitCount" class="text-surface-300 font-semibold tabular-nums">…</span></p>
       <p class="text-[11px] text-surface-500">&copy; 2026 MDMF Team. All rights reserved.</p>
     </div>
   </footer>
@@ -553,6 +554,20 @@ function renderResult(data) {
 // ================================================================
 function showError(m) { errorMsg.textContent=m; errorMsg.classList.remove('hidden'); }
 function clearError()  { errorMsg.textContent=''; errorMsg.classList.add('hidden'); }
+
+// ================================================================
+// PAGE VISIT COUNTER
+// ================================================================
+(async function() {
+  const el = document.getElementById('visitCount');
+  try {
+    const res = await fetch('https://abacus.jasoncameron.dev/hit/kevinc6986-mdmf/visits');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    if (typeof data.value === 'number') el.textContent = data.value.toLocaleString();
+    else el.textContent = '—';
+  } catch (_) { el.textContent = '—'; }
+})();
 
 // ================================================================
 // INIT
