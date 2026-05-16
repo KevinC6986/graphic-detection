@@ -119,21 +119,21 @@
 
   <!-- HEADER -->
   <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-surface-200/60">
-    <div class="max-w-5xl mx-auto px-6 flex items-center justify-between h-[64px]">
+    <div class="max-w-5xl mx-auto px-6 grid grid-cols-3 items-center h-[64px]">
       <a href="#upload" class="flex items-center gap-3 cursor-pointer group">
         <img src="MDMF_logo.jpg" alt="MDMF Logo" class="header-logo">
         <span class="text-[16px] font-bold tracking-tight text-surface-800 group-hover:text-brand-600 transition-colors">
           MDMF<span class="text-brand-500">AI</span>
         </span>
       </a>
-      <nav class="hidden md:flex items-center gap-8">
-        <a href="#upload" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">Detect</a>
+      <nav class="hidden md:flex items-center justify-center">
         <a href="https://google.com" target="_blank" rel="noopener noreferrer" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">How It Works</a>
-        <a href="#about" class="text-[13px] font-medium text-surface-500 hover:text-surface-800 transition-colors">About</a>
       </nav>
-      <a href="#upload" class="hidden md:inline-flex px-5 py-2 text-[13px] font-semibold text-white bg-brand-500 hover:bg-brand-600 rounded-full transition-all hover:shadow-lg hover:shadow-brand-500/20">
-        Try it
-      </a>
+      <div class="flex justify-end">
+        <a href="#upload" class="hidden md:inline-flex px-5 py-2 text-[13px] font-semibold text-white bg-brand-500 hover:bg-brand-600 rounded-full transition-all hover:shadow-lg hover:shadow-brand-500/20">
+          Try it
+        </a>
+      </div>
     </div>
   </header>
 
